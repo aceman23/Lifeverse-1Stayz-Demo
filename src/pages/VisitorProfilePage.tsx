@@ -18,21 +18,131 @@ const TAG_LABELS: Record<string, string> = {
   recently_moved: 'Recently moved to town',
   college_student: 'College student',
   single_parent: 'Single parent',
-  brought_kids: 'Came with her kids',
+  brought_kids: 'Came with kids',
   has_family: 'Came with family',
   connected_with_pastor: 'Met with pastor',
   evening_service: 'Evening service attendee',
 };
 
-const AI_LEARNED: Record<string, string> = {
-  first_time_guest: 'Prefers short messages',
-  returning_guest: 'Responded to our gift',
-  brought_kids: 'Interested in community',
-  has_family: 'Enjoys family ministry',
-  recently_moved: 'New to the area',
-  connected_with_pastor: 'Connected with pastoral team',
-  college_student: 'Interested in young adults group',
-};
+// Deterministic seeded random using visitor id
+function seededRand(seed: string, index: number): number {
+  let h = index * 2654435761;
+  for (let i = 0; i < seed.length; i++) {
+    h = Math.imul(h ^ seed.charCodeAt(i), 2654435761);
+  }
+  return ((h >>> 0) / 0xffffffff);
+}
+
+function pickUnique<T>(pool: T[], count: number, seed: string, offset = 0): T[] {
+  const available = [...pool];
+  const result: T[] = [];
+  for (let i = 0; i < count && available.length > 0; i++) {
+    const idx = Math.floor(seededRand(seed, offset + i) * available.length);
+    result.push(available.splice(idx, 1)[0]);
+  }
+  return result;
+}
+
+const FEMALE_NAMES = new Set([
+  'sarah', 'rachel', 'maria', 'emily', 'jessica', 'ashley', 'amanda', 'stephanie',
+  'jennifer', 'nicole', 'brittany', 'elizabeth', 'megan', 'lauren', 'brittney',
+  'lisa', 'karen', 'patricia', 'linda', 'barbara', 'susan', 'margaret', 'sandra',
+  'donna', 'carol', 'ruth', 'sharon', 'michelle', 'laura', 'sarah', 'kimberly',
+  'deborah', 'dorothy', 'lisa', 'nancy', 'betty', 'helen', 'sandra', 'donna',
+  'anna', 'grace', 'claire', 'isabella', 'sophia', 'olivia', 'emma', 'ava',
+  'mia', 'abigail', 'madison', 'chloe', 'ella', 'lily', 'natalie', 'hannah',
+  'savannah', 'addison', 'aubrey', 'zoe', 'brooklyn', 'nora', 'leah', 'aria',
+]);
+
+function isFemale(firstName: string): boolean {
+  return FEMALE_NAMES.has(firstName.toLowerCase());
+}
+
+const MALE_WHAT_WE_KNOW = [
+  'First-time guest',
+  'Attended the morning service',
+  'Came alone',
+  'Came with a friend',
+  'Came with his family',
+  'Came with his spouse',
+  'Has young children at home',
+  'Recently moved to the area',
+  'Works in the local community',
+  'Expressed interest in small groups',
+  'Interested in men\'s ministry',
+  'Filled out a connection card',
+  'Spoke with a greeter',
+  'Engaged during worship',
+  'Attended a midweek event previously',
+];
+
+const FEMALE_WHAT_WE_KNOW = [
+  'First-time guest',
+  'Attended the morning service',
+  'Came alone',
+  'Came with a friend',
+  'Came with her family',
+  'Came with her spouse',
+  'Has young children at home',
+  'Recently moved to the area',
+  'Works in the local community',
+  'Expressed interest in small groups',
+  'Interested in women\'s ministry',
+  'Filled out a connection card',
+  'Spoke with a greeter',
+  'Engaged during worship',
+  'Attended a midweek event previously',
+];
+
+const MALE_AI_LEARNED = [
+  'Prefers direct, concise messages',
+  'Responded well to our welcome text',
+  'Opened the follow-up email',
+  'Interested in joining a small group',
+  'Engaged with men\'s ministry content',
+  'Clicked the video link we sent',
+  'Has shown consistent interest',
+  'Likely to respond to a personal call',
+  'Comfortable with digital communication',
+  'Attended during a personal transition',
+  'Appreciates practical teaching',
+  'Responded positively to the gift we sent',
+];
+
+const FEMALE_AI_LEARNED = [
+  'Prefers warm, personal messages',
+  'Responded well to our welcome text',
+  'Opened the follow-up email',
+  'Interested in joining a small group',
+  'Engaged with women\'s ministry content',
+  'Clicked the video link we sent',
+  'Has shown consistent interest',
+  'Likely to respond to a personal call',
+  'Comfortable with digital communication',
+  'Attended during a personal transition',
+  'Values community and connection',
+  'Responded positively to the gift we sent',
+];
+
+function getWhatWeKnow(visitor: VisitorWithDetails): string[] {
+  const female = isFemale(visitor.first_name);
+  const pool = female ? FEMALE_WHAT_WE_KNOW : MALE_WHAT_WE_KNOW;
+  const seed = visitor.id + '_know';
+  const items = pickUnique(pool, 3, seed);
+  // Always lead with "First-time guest" if not already in result
+  if (!items.includes('First-time guest')) {
+    items.unshift('First-time guest');
+    items.pop();
+  }
+  return items;
+}
+
+function getAILearned(visitor: VisitorWithDetails): string[] {
+  const female = isFemale(visitor.first_name);
+  const pool = female ? FEMALE_AI_LEARNED : MALE_AI_LEARNED;
+  const seed = visitor.id + '_ai';
+  return pickUnique(pool, 4, seed);
+}
 
 const JOURNEY_STEPS = [
   { key: 'text', label: 'Text Sent' },
@@ -254,13 +364,8 @@ export function VisitorProfilePage() {
     );
   }
 
-  const aiLearned = visitor.segmentation_tags
-    ?.filter((t) => AI_LEARNED[t])
-    .map((t) => AI_LEARNED[t]) ?? [];
-
-  if (aiLearned.length === 0) {
-    aiLearned.push('Prefers short messages', 'Responded to our gift', 'Interested in community', 'Enjoys kids ministry');
-  }
+  const whatWeKnow = getWhatWeKnow(visitor);
+  const aiLearned = getAILearned(visitor);
 
   return (
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-12">
@@ -319,18 +424,12 @@ export function VisitorProfilePage() {
             <div className="bg-white border border-stone-100 rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-stone-800 mb-3">What We Know</h3>
               <ul className="space-y-2">
-                {visitor.segmentation_tags?.map((tag) => (
-                  <li key={tag} className="flex items-center gap-2 text-sm text-stone-600">
+                {whatWeKnow.map((item, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-stone-600">
                     <span className="w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0" />
-                    {TAG_LABELS[tag] ?? tag.replace(/_/g, ' ')}
+                    {item}
                   </li>
                 ))}
-                {(visitor.segmentation_tags?.length ?? 0) === 0 && (
-                  <>
-                    <li className="flex items-center gap-2 text-sm text-stone-600"><span className="w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0" />First-time guest</li>
-                    <li className="flex items-center gap-2 text-sm text-stone-600"><span className="w-1.5 h-1.5 rounded-full bg-stone-300 shrink-0" />Came with her kids</li>
-                  </>
-                )}
               </ul>
             </div>
 
