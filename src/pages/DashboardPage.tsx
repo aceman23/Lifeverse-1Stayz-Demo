@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users, MessageCircle, UserCheck, ChevronRight, CheckCircle2,
   Zap, ArrowLeft, Sparkles, X, Gift,
@@ -390,10 +391,13 @@ function Avatar({ visitor, size = 'sm' }: { visitor: Visitor; size?: 'sm' | 'md'
   );
 }
 
-function VisitorRow({ visitor }: { visitor: Visitor }) {
+function VisitorRow({ visitor, onClick }: { visitor: Visitor; onClick: () => void }) {
   const badge = getStatusBadge(visitor.follow_up_status ?? '');
   return (
-    <div className="flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors cursor-pointer group border-b border-stone-50 last:border-0">
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-stone-50 transition-colors group border-b border-stone-50 last:border-0 text-left"
+    >
       <Avatar visitor={visitor} size="sm" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-stone-800 truncate">{fullName(visitor)}</p>
@@ -403,12 +407,13 @@ function VisitorRow({ visitor }: { visitor: Visitor }) {
         {badge.label}
       </span>
       <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-stone-500 transition-colors shrink-0" />
-    </div>
+    </button>
   );
 }
 
 /* ── Dashboard page ─────────────────────────────────────────────── */
 export function DashboardPage() {
+  const navigate = useNavigate();
   const { stats, loading: statsLoading } = useDashboardStats();
   const { visitors, loading: visitorsLoading } = useVisitorPipeline();
   const { visitor: aiVisitor, loading: aiLoading } = useAIRecommendation();
@@ -506,7 +511,7 @@ export function DashboardPage() {
         <div className="flex-1 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-stone-50">
             <span className="text-sm font-semibold text-stone-800">People We Saved From Leaving</span>
-            <button className="text-xs text-[#2ec27e] font-semibold hover:underline">View all</button>
+            <button onClick={() => navigate('/people')} className="text-xs text-[#2ec27e] font-semibold hover:underline">View all</button>
           </div>
           <div>
             {visitorsLoading ? (
@@ -518,7 +523,7 @@ export function DashboardPage() {
             ) : visitors.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-stone-400">No visitors to display yet.</div>
             ) : (
-              visitors.slice(0, 5).map((v) => <VisitorRow key={v.id} visitor={v} />)
+              visitors.slice(0, 5).map((v) => <VisitorRow key={v.id} visitor={v} onClick={() => navigate(`/visitor/${v.id}`)} />)
             )}
           </div>
         </div>
