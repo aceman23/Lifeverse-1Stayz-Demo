@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, MoreHorizontal, Play, CheckCircle2, XCircle,
-  Mail, MessageSquare, Video, Check, Sparkles,
+  Mail, MessageSquare, Video, Check, Sparkles, Coffee,
+  Calendar, Clock, User, MapPin, X,
 } from 'lucide-react';
 import { useVisitorDetails } from '../lib/hooks';
 import { formatDate } from '../lib/utils';
@@ -334,10 +335,179 @@ function CTAPanel({ visitor }: { visitor: VisitorWithDetails }) {
   );
 }
 
+const COFFEE_TIMES = [
+  { day: 'Thursday, May 16, 2024', time: '10:00 AM' },
+  { day: 'Thursday, May 16, 2024', time: '4:00 PM' },
+  { day: 'Saturday, May 18, 2024', time: '9:30 AM' },
+];
+
+function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; onClose: () => void }) {
+  const [selected, setSelected] = useState(0);
+  const [booked, setBooked] = useState(false);
+
+  const pastor = visitor.pastor ?? { name: 'Pastor Mark', role: 'Lead Pastor', avatar_url: null };
+
+  if (booked) {
+    const picked = COFFEE_TIMES[selected];
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          {/* Step indicator */}
+          <div className="bg-stone-50 border-b border-stone-100 px-5 py-3 flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-[#2ec27e] flex items-center justify-center text-white text-xs font-bold shrink-0">5</div>
+            <div>
+              <p className="text-xs font-bold text-stone-800 uppercase tracking-wide">Coffee Booked</p>
+              <p className="text-[11px] text-stone-400">Meeting confirmed & pastor notified</p>
+            </div>
+          </div>
+
+          <div className="px-6 py-8 flex flex-col items-center gap-4">
+            {/* Success icon */}
+            <div className="relative w-20 h-20 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border-2 border-dashed border-[#2ec27e]/30 animate-spin" style={{ animationDuration: '8s' }} />
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1.5 h-1.5 rounded-full bg-[#2ec27e]/30"
+                  style={{
+                    transform: `rotate(${i * 45}deg) translateY(-36px)`,
+                  }}
+                />
+              ))}
+              <div className="w-14 h-14 rounded-full bg-[#1a2e2a] flex items-center justify-center shadow-lg z-10">
+                <CheckCircle2 className="w-7 h-7 text-[#2ec27e]" strokeWidth={2} />
+              </div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-lg font-bold text-stone-900">You're all set!</p>
+              <p className="text-sm text-stone-500 mt-0.5">Coffee meeting scheduled.</p>
+            </div>
+
+            {/* Meeting details */}
+            <div className="w-full border border-stone-100 rounded-xl divide-y divide-stone-50 overflow-hidden">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Calendar className="w-4 h-4 text-stone-400 shrink-0" />
+                <span className="text-sm text-stone-700">{picked.day}</span>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Clock className="w-4 h-4 text-stone-400 shrink-0" />
+                <span className="text-sm text-stone-700">{picked.time}</span>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <User className="w-4 h-4 text-stone-400 shrink-0" />
+                <span className="text-sm text-stone-700">With {pastor.name}</span>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <MapPin className="w-4 h-4 text-stone-400 shrink-0" />
+                <span className="text-sm text-stone-700">1Stayz Church — Main Campus</span>
+              </div>
+            </div>
+
+            {/* Pastor notification */}
+            <div className="w-full flex items-center gap-3 bg-[#fdf6ee] border border-amber-100 rounded-xl px-4 py-3">
+              {pastor.avatar_url ? (
+                <img src={pastor.avatar_url} alt={pastor.name} className="w-10 h-10 rounded-full object-cover shrink-0 border border-stone-100" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a2e2a] to-[#2ec27e] flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                  {pastor.name.split(' ').map((n) => n[0]).join('')}
+                </div>
+              )}
+              <p className="text-xs text-stone-600 leading-relaxed">
+                <span className="font-semibold">{pastor.name}</span> has been notified and is looking forward to meeting you!
+              </p>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="w-full bg-[#1a2e2a] hover:bg-[#243d37] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
+            >
+              View Conversation
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="bg-stone-50 border-b border-stone-100 px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-[#1a2e2a] flex items-center justify-center text-white shrink-0">
+              <Coffee className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-stone-800 uppercase tracking-wide">Book a Coffee Meeting</p>
+              <p className="text-[11px] text-stone-400">Schedule time with {visitor.first_name}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-stone-300 hover:text-stone-500 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="px-5 py-5 space-y-4">
+          {/* Visitor row */}
+          <div className="flex items-center gap-3 p-3 bg-stone-50 rounded-xl">
+            {visitor.avatar_url ? (
+              <img src={visitor.avatar_url} alt={visitor.first_name} className="w-10 h-10 rounded-full object-cover border border-stone-100 shrink-0" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a2e2a] to-[#2ec27e] flex items-center justify-center text-white text-sm font-semibold shrink-0">
+                {initials(visitor)}
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-semibold text-stone-800">{visitor.first_name} {visitor.last_name}</p>
+              <p className="text-xs text-stone-400">Coffee with {pastor.name}</p>
+            </div>
+          </div>
+
+          {/* Time slots */}
+          <div>
+            <p className="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2.5">Pick a time</p>
+            <div className="space-y-2">
+              {COFFEE_TIMES.map((t, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelected(i)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                    selected === i
+                      ? 'border-[#2ec27e] bg-[#eaf7f1]'
+                      : 'border-stone-100 bg-white hover:border-stone-200'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                    selected === i ? 'border-[#2ec27e]' : 'border-stone-300'
+                  }`}>
+                    {selected === i && <div className="w-2 h-2 rounded-full bg-[#2ec27e]" />}
+                  </div>
+                  <span className="text-sm text-stone-600">{t.day}</span>
+                  <span className="ml-auto text-sm font-semibold text-stone-800">{t.time}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setBooked(true)}
+            className="w-full bg-[#1a2e2a] hover:bg-[#243d37] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
+          >
+            Confirm Coffee Meeting
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function VisitorProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { visitor, loading } = useVisitorDetails(id ?? '');
+  const [showCoffeeModal, setShowCoffeeModal] = useState(false);
 
   if (loading) {
     return (
@@ -380,6 +550,13 @@ export function VisitorProfilePage() {
             Back to People
           </button>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowCoffeeModal(true)}
+              className="flex items-center gap-1.5 text-sm font-semibold bg-[#1a2e2a] hover:bg-[#243d37] text-white px-4 py-2 rounded-xl transition-colors shadow-sm"
+            >
+              <Coffee className="w-4 h-4" />
+              Book Coffee
+            </button>
             <button className="text-sm font-medium text-stone-600 hover:text-stone-900 px-3 py-1.5 rounded-lg hover:bg-stone-100 transition-colors">
               Edit Profile
             </button>
@@ -483,6 +660,10 @@ export function VisitorProfilePage() {
           </div>
         )}
       </div>
+
+      {showCoffeeModal && (
+        <BookCoffeeModal visitor={visitor} onClose={() => setShowCoffeeModal(false)} />
+      )}
     </div>
   );
 }
