@@ -288,7 +288,7 @@ function CTAPanel({ visitor }: { visitor: VisitorWithDetails }) {
       <div className="flex gap-2">
         <button
           onClick={() => setResponded('yes')}
-          className="flex-1 bg-[#1a2e2a] hover:bg-[#243d37] text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
+          className="flex-1 bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
         >
           Yes, I got it
         </button>
@@ -420,7 +420,7 @@ function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; on
 
             <button
               onClick={onClose}
-              className="w-full bg-[#1a2e2a] hover:bg-[#243d37] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
+              className="w-full bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
             >
               View Conversation
             </button>
@@ -493,7 +493,7 @@ function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; on
 
           <button
             onClick={() => setBooked(true)}
-            className="w-full bg-[#1a2e2a] hover:bg-[#243d37] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
+            className="w-full bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
           >
             Confirm Coffee Meeting
           </button>
@@ -552,7 +552,7 @@ export function VisitorProfilePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowCoffeeModal(true)}
-              className="flex items-center gap-1.5 text-sm font-semibold bg-[#1a2e2a] hover:bg-[#243d37] text-white px-4 py-2 rounded-xl transition-colors shadow-sm"
+              className="flex items-center gap-1.5 text-sm font-semibold bg-[#2ec27e] hover:bg-[#28ae6e] text-white px-4 py-2 rounded-xl transition-colors shadow-sm"
             >
               <Coffee className="w-4 h-4" />
               Book Coffee
