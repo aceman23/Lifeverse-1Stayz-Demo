@@ -57,8 +57,9 @@ export function Sidebar() {
       </nav>
 
       {/* Footer brand */}
-      <div className="px-4 py-4 border-t border-white/10">
+      <div className="px-4 py-4 border-t border-white/10 flex items-center justify-between">
         <p className="text-white/40 text-xs">1Stayz by Lifeverse</p>
+        <span className="text-white/25 text-[10px] font-mono tracking-wide">v{__APP_VERSION__}</span>
       </div>
     </aside>
   );
