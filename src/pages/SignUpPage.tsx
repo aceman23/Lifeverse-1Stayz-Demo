@@ -91,7 +91,7 @@ export function SignUpPage() {
 
           <div className="mb-8">
             <h1 className="text-2xl font-semibold text-stone-900 mb-1.5">Create your account</h1>
-            <p className="text-sm text-stone-500">Start engaging your visitors with Kingdom Ambassadors.</p>
+            <p className="text-sm text-stone-500">Start engaging your visitors with agentic AI digital assistants.</p>
           </div>
 
           {success && (

@@ -55,7 +55,7 @@ export function LoginPage() {
             <span className="font-semibold text-[#2ec27e]">Retain more of your 1st time visitors.</span>
           </h2>
           <p className="text-stone-500 text-base leading-relaxed max-w-sm">
-            Kingdom Ambassadors helps your church follow up with every guest through intelligent,
+            agentic AI digital assistants helps your church follow up with every guest through intelligent,
             personalized engagement that feels genuinely human.
           </p>
           <div className="mt-10 flex justify-center">
@@ -75,7 +75,7 @@ export function LoginPage() {
               <img src="/LVHI_1Stayz.png" alt="1Stayz" className="w-auto" style={{ height: '11.25rem', clipPath: 'inset(20% 0 15% 0)' }} />
             </div>
             <h1 className="text-2xl font-semibold text-stone-900 mb-1.5">Welcome back</h1>
-            <p className="text-sm text-stone-500">Sign in to your Kingdom Ambassadors account.</p>
+            <p className="text-sm text-stone-500">Sign in to your agentic AI digital assistants account.</p>
           </div>
 
           {error && (
