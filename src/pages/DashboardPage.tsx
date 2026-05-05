@@ -453,7 +453,7 @@ export function DashboardPage() {
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-stone-900 leading-tight">
-          Every Visitor Shepherded.<br />Every Time.
+          Save These Visitors.<br />Reap the Harvest Given to You.
         </h1>
         <p className="text-sm text-stone-400 mt-2">Agentic AI that recognizes, remembers, and responds.</p>
       </div>
