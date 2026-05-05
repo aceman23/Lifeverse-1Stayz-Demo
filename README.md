@@ -1,4 +1,4 @@
-# 1Stayz — Kingdom Ambassadors
+# 1Stayz — Agentic AI Digital Assistants for Churches
 
 [![Open in Bolt](https://bolt.new/static/open-in-bolt.svg)](https://bolt.new/~/sb1-imn9byw7)
 
