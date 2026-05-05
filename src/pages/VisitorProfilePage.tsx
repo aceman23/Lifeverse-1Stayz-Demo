@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, MoreHorizontal, Play, CheckCircle2, XCircle,
@@ -242,6 +242,22 @@ function JourneyTimeline({ visitor }: { visitor: VisitorWithDetails }) {
 
 function CTAPanel({ visitor }: { visitor: VisitorWithDetails }) {
   const [responded, setResponded] = useState<'yes' | 'no' | null>(null);
+  const [pressing, setPressing] = useState<'yes' | 'no' | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 10);
+    return () => clearTimeout(t);
+  }, [responded]);
+
+  function handleRespond(val: 'yes' | 'no') {
+    setPressing(val);
+    setTimeout(() => {
+      setPressing(null);
+      setVisible(false);
+      setTimeout(() => setResponded(val), 80);
+    }, 180);
+  }
 
   const whySent = visitor.follow_up_status === 'concern_raised' || visitor.follow_up_status === 'escalated'
     ? { goal: 'Re-engage', trigger: 'No response to email', action: 'Video message', reason: 'Highest response rate' }
@@ -258,43 +274,55 @@ function CTAPanel({ visitor }: { visitor: VisitorWithDetails }) {
 
   if (responded === 'yes') {
     return (
-      <div className="flex flex-col items-center py-8 gap-3">
-        <div className="w-12 h-12 rounded-full bg-[#2ec27e] flex items-center justify-center">
+      <div className={`flex flex-col items-center py-8 gap-3 transition-all duration-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+        <div className="w-12 h-12 rounded-full bg-[#2ec27e] flex items-center justify-center animate-[bounceIn_0.4s_ease-out]">
           <CheckCircle2 className="w-6 h-6 text-white" />
         </div>
         <p className="text-sm font-semibold text-stone-800">Marked as responded!</p>
         <p className="text-xs text-stone-400 text-center">We'll move {visitor.first_name} to the next stage.</p>
-        <button onClick={() => setResponded(null)} className="text-xs text-[#2ec27e] hover:underline mt-1">Undo</button>
+        <button onClick={() => { setVisible(false); setTimeout(() => setResponded(null), 150); }} className="text-xs text-[#2ec27e] hover:underline mt-1 transition-opacity hover:opacity-70">Undo</button>
       </div>
     );
   }
 
   if (responded === 'no') {
     return (
-      <div className="flex flex-col items-center py-8 gap-3">
-        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+      <div className={`flex flex-col items-center py-8 gap-3 transition-all duration-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center animate-[bounceIn_0.4s_ease-out]">
           <XCircle className="w-6 h-6 text-amber-600" />
         </div>
         <p className="text-sm font-semibold text-stone-800">Noted — no response yet.</p>
         <p className="text-xs text-stone-400 text-center">We'll try a different approach for {visitor.first_name}.</p>
-        <button onClick={() => setResponded(null)} className="text-xs text-[#2ec27e] hover:underline mt-1">Undo</button>
+        <button onClick={() => { setVisible(false); setTimeout(() => setResponded(null), 150); }} className="text-xs text-[#2ec27e] hover:underline mt-1 transition-opacity hover:opacity-70">Undo</button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 transition-all duration-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
       {/* CTA Buttons */}
       <div className="flex gap-2">
         <button
-          onClick={() => setResponded('yes')}
-          className="flex-1 bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
+          onMouseDown={() => setPressing('yes')}
+          onMouseUp={() => handleRespond('yes')}
+          onMouseLeave={() => setPressing(null)}
+          onTouchStart={() => setPressing('yes')}
+          onTouchEnd={() => handleRespond('yes')}
+          className={`flex-1 bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-2.5 rounded-xl transition-all duration-150 select-none ${
+            pressing === 'yes' ? 'scale-95 bg-[#28ae6e] shadow-inner' : 'scale-100 shadow-sm hover:shadow'
+          }`}
         >
           Yes, I got it
         </button>
         <button
-          onClick={() => setResponded('no')}
-          className="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-semibold py-2.5 rounded-xl transition-colors"
+          onMouseDown={() => setPressing('no')}
+          onMouseUp={() => handleRespond('no')}
+          onMouseLeave={() => setPressing(null)}
+          onTouchStart={() => setPressing('no')}
+          onTouchEnd={() => handleRespond('no')}
+          className={`flex-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-sm font-semibold py-2.5 rounded-xl transition-all duration-150 select-none ${
+            pressing === 'no' ? 'scale-95 bg-stone-200 shadow-inner' : 'scale-100'
+          }`}
         >
           No, I didn't
         </button>
@@ -344,6 +372,22 @@ const COFFEE_TIMES = [
 function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; onClose: () => void }) {
   const [selected, setSelected] = useState(0);
   const [booked, setBooked] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setModalVisible(true), 10);
+    return () => clearTimeout(t);
+  }, []);
+
+  function handleConfirm() {
+    setConfirming(true);
+    setTimeout(() => {
+      setConfirming(false);
+      setModalVisible(false);
+      setTimeout(() => setBooked(true), 120);
+    }, 220);
+  }
 
   const pastor = visitor.pastor ?? { name: 'Pastor Mark', role: 'Lead Pastor', avatar_url: null };
 
@@ -351,7 +395,7 @@ function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; on
     const picked = COFFEE_TIMES[selected];
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-[slideUp_0.3s_ease-out]" onClick={(e) => e.stopPropagation()}>
           {/* Step indicator */}
           <div className="bg-stone-50 border-b border-stone-100 px-5 py-3 flex items-center gap-3">
             <div className="w-7 h-7 rounded-full bg-[#2ec27e] flex items-center justify-center text-white text-xs font-bold shrink-0">5</div>
@@ -432,7 +476,10 @@ function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden transition-all duration-200 ${modalVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="bg-stone-50 border-b border-stone-100 px-5 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -492,10 +539,21 @@ function BookCoffeeModal({ visitor, onClose }: { visitor: VisitorWithDetails; on
           </div>
 
           <button
-            onClick={() => setBooked(true)}
-            className="w-full bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-3 rounded-xl transition-colors"
+            onMouseDown={() => setConfirming(true)}
+            onMouseUp={handleConfirm}
+            onMouseLeave={() => setConfirming(false)}
+            onTouchStart={() => setConfirming(true)}
+            onTouchEnd={handleConfirm}
+            className={`w-full bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-3 rounded-xl transition-all duration-150 select-none flex items-center justify-center gap-2 ${
+              confirming ? 'scale-95 bg-[#28ae6e] shadow-inner' : 'scale-100 shadow-sm hover:shadow'
+            }`}
           >
-            Confirm Coffee Meeting
+            {confirming ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Booking...
+              </>
+            ) : 'Confirm Coffee Meeting'}
           </button>
         </div>
       </div>
@@ -508,6 +566,7 @@ export function VisitorProfilePage() {
   const navigate = useNavigate();
   const { visitor, loading } = useVisitorDetails(id ?? '');
   const [showCoffeeModal, setShowCoffeeModal] = useState(false);
+  const [pressingCoffee, setPressingCoffee] = useState(false);
 
   if (loading) {
     return (
@@ -551,10 +610,16 @@ export function VisitorProfilePage() {
           </button>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowCoffeeModal(true)}
-              className="flex items-center gap-1.5 text-sm font-semibold bg-[#2ec27e] hover:bg-[#28ae6e] text-white px-4 py-2 rounded-xl transition-colors shadow-sm"
+              onMouseDown={() => setPressingCoffee(true)}
+              onMouseUp={() => { setPressingCoffee(false); setShowCoffeeModal(true); }}
+              onMouseLeave={() => setPressingCoffee(false)}
+              onTouchStart={() => setPressingCoffee(true)}
+              onTouchEnd={() => { setPressingCoffee(false); setShowCoffeeModal(true); }}
+              className={`flex items-center gap-1.5 text-sm font-semibold bg-[#2ec27e] hover:bg-[#28ae6e] text-white px-4 py-2 rounded-xl transition-all duration-150 select-none ${
+                pressingCoffee ? 'scale-95 bg-[#28ae6e] shadow-inner' : 'scale-100 shadow-sm hover:shadow'
+              }`}
             >
-              <Coffee className="w-4 h-4" />
+              <Coffee className={`w-4 h-4 transition-transform duration-150 ${pressingCoffee ? 'rotate-12' : ''}`} />
               Book Coffee
             </button>
             <button className="text-sm font-medium text-stone-600 hover:text-stone-900 px-3 py-1.5 rounded-lg hover:bg-stone-100 transition-colors">
