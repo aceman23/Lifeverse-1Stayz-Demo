@@ -18,7 +18,7 @@ interface ChatWidgetProps {
 
 const AUTH_SUGGESTIONS: Suggestion[] = [
   {
-    label: 'What is agentic AI digital assistants?',
+    label: 'What is Agentic AI digital assistants?',
     response: "Agentic AI digital assistants is a pastoral care platform that helps churches follow up with first-time visitors through AI-powered conversations, a 6-week outreach sequence, and smart escalation to pastors when someone needs support.",
   },
   {
@@ -54,7 +54,7 @@ const DASHBOARD_SUGGESTIONS: Suggestion[] = [
   },
 ];
 
-const GRACE_GREETING_AUTH = "Hi! I'm Grace, your agentic AI digital assistants assistant. How can I help you today?";
+const GRACE_GREETING_AUTH = "Hi! I'm Grace, your Agentic AI digital assistants assistant. How can I help you today?";
 const GRACE_GREETING_DASHBOARD = "Hi! I'm Grace. Need help navigating the platform or understanding a feature?";
 
 const FALLBACK_RESPONSE = "That's a great question. For anything not covered here, please reach out to your church administrator or contact our support team. I'm here to help with platform navigation and general questions.";
@@ -128,7 +128,7 @@ export function ChatWidget({ context = 'auth' }: ChatWidgetProps) {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold leading-none">Grace</p>
-              <p className="text-[11px] text-stone-400 mt-0.5">agentic AI digital assistants Assistant</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">Agentic AI digital assistants Assistant</p>
             </div>
             <button
               onClick={() => setOpen(false)}

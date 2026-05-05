@@ -85,7 +85,7 @@ export function IngestionPage() {
           <div>
             <h1 className="text-2xl font-semibold text-stone-900">Ingestion Service</h1>
             <p className="text-sm text-stone-500 mt-1">
-              Church forms and check-ins flowing into the agentic AI digital assistants pipeline
+              Church forms and check-ins flowing into the Agentic AI digital assistants pipeline
             </p>
           </div>
           <div className="flex items-center gap-3">
