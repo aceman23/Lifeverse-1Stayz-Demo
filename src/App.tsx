@@ -5,6 +5,8 @@ import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
+import { BetaSignupPage } from './pages/BetaSignupPage';
+import { BetaQRPage } from './pages/BetaQRPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { ConversationsPage } from './pages/ConversationsPage';
@@ -46,6 +48,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/beta" element={<BetaSignupPage />} />
+          <Route path="/beta/qr" element={<BetaQRPage />} />
           <Route
             path="/*"
             element={
