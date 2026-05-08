@@ -12,7 +12,7 @@ export function BetaQRPage() {
       <div className="absolute top-[-60px] right-[-60px] w-64 h-64 rounded-full bg-amber-100/60 blur-3xl" />
       <div className="absolute bottom-[-40px] left-[-40px] w-56 h-56 rounded-full bg-stone-200/50 blur-3xl" />
 
-      <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-20 mb-8 drop-shadow-sm relative z-10" />
+      <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-40 mb-8 drop-shadow-sm relative z-10" />
 
       <div className="bg-white border border-stone-200 rounded-3xl p-10 flex flex-col items-center shadow-lg relative z-10">
         <QRCodeSVG

@@ -72,7 +72,7 @@ export function LoginPage() {
 
           <div className="mb-8">
             <div className="mb-4 flex justify-center">
-              <img src="/LVHI_1Stayz.png" alt="1Stayz" className="w-auto" style={{ height: '11.25rem', clipPath: 'inset(20% 0 15% 0)' }} />
+              <img src="/LVHI_1Stayz.png" alt="1Stayz" className="w-auto" style={{ height: '22.5rem', clipPath: 'inset(20% 0 15% 0)' }} />
             </div>
             <h1 className="text-2xl font-semibold text-stone-900 mb-1.5">Welcome back</h1>
             <p className="text-sm text-stone-500">Sign in to your Agentic AI digital assistants account.</p>
