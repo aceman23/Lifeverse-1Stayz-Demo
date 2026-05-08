@@ -1,4 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react';
+import { ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const BETA_URL = 'https://lifeverse-1stayz-demo1.bolt.host/beta';
 
@@ -24,9 +26,11 @@ export function BetaQRPage() {
       </p>
 
       <p className="text-xs text-stone-300 mt-10">{BETA_URL}</p>
+
+      <Link to="/login" className="flex items-center gap-1.5 text-sm text-stone-400 hover:text-stone-600 transition mt-6">
+        <ArrowLeft className="w-4 h-4" />
+        Back to login
+      </Link>
     </div>
   );
 }
-
-
-export { BetaQRPage }

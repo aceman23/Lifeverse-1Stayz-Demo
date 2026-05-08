@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 const CHURCH_SIZES = ['Under 100', '100–300', '300–500', '500–1,000', '1,000+'];
@@ -183,7 +184,12 @@ export function BetaSignupPage() {
           </button>
         </form>
 
-        <div className="flex flex-col items-center mt-6">
+        <Link to="/login" className="flex items-center justify-center gap-1.5 text-sm text-stone-400 hover:text-stone-600 transition mt-5">
+          <ArrowLeft className="w-4 h-4" />
+          Back to login
+        </Link>
+
+        <div className="flex flex-col items-center mt-4">
           <img src="/LifeversLogo.png" alt="Lifeverse Holdings" className="h-16 w-auto opacity-60" />
         </div>
       </div>
