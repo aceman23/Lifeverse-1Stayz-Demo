@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Settings, Download, Loader2, RefreshCw } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 import type { BetaSignup } from '../lib/types';
+
+const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-beta-signups`;
 
 export function SettingsPage() {
   const [signups, setSignups] = useState<BetaSignup[]>([]);
@@ -11,12 +12,16 @@ export function SettingsPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setFetchError('');
-    const { data, error } = await supabase
-      .from('beta_signups')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) setFetchError(error.message);
-    setSignups((data as BetaSignup[]) ?? []);
+    try {
+      const res = await fetch(FUNCTION_URL, {
+        headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? res.statusText);
+      setSignups(json as BetaSignup[]);
+    } catch (err) {
+      setFetchError(String(err));
+    }
     setLoading(false);
   }, []);
 
