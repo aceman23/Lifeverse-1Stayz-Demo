@@ -58,7 +58,7 @@ export function BetaSignupPage() {
           </div>
           <h1 className="text-2xl font-bold text-stone-900 mb-2">You're In!</h1>
           <p className="text-stone-500 max-w-xs mx-auto">
-            Thanks for signing up for the 1Stayz beta. We'll be in touch soon.
+            Thanks for signing up for the 1Stayz pilot. We'll be in touch soon.
           </p>
         </div>
       </div>
@@ -70,7 +70,7 @@ export function BetaSignupPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-4">
           <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-20 mx-auto mb-2" />
-          <h1 className="text-2xl font-bold text-stone-900 leading-tight">Join the Beta</h1>
+          <h1 className="text-2xl font-bold text-stone-900 leading-tight">Join the Pilot</h1>
           <p className="text-sm text-stone-500 mt-1">Help us build the future of visitor follow-up.</p>
         </div>
 
@@ -179,7 +179,7 @@ export function BetaSignupPage() {
                 Submitting...
               </>
             ) : (
-              'Join the Beta'
+              'Join the Pilot'
             )}
           </button>
         </form>
