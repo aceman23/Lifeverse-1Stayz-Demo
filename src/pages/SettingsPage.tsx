@@ -66,7 +66,7 @@ export function SettingsPage() {
       <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden mb-6">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
           <div>
-            <h2 className="text-base font-semibold text-stone-800">Beta Signups</h2>
+            <h2 className="text-base font-semibold text-stone-800">Pilot Signups</h2>
             <p className="text-xs text-stone-400 mt-0.5">{loading ? '...' : `${signups.length} total signups`}</p>
           </div>
           <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function SettingsPage() {
           </div>
         ) : signups.length === 0 ? (
           <div className="py-16 text-center">
-            <p className="text-sm text-stone-400">No beta signups yet.</p>
+            <p className="text-sm text-stone-400">No pilot signups yet.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

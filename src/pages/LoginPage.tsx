@@ -172,7 +172,7 @@ export function LoginPage() {
 
           <div className="flex items-center justify-center gap-4 mt-4">
             <Link to="/beta" className="text-xs text-teal-700 hover:text-teal-800 font-medium transition-colors">
-              Join the Beta
+              Join the Pilot
             </Link>
             <span className="text-stone-300">|</span>
             <Link to="/beta/qr" className="text-xs text-teal-700 hover:text-teal-800 font-medium transition-colors">
