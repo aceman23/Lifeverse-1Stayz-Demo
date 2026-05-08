@@ -5,7 +5,7 @@ const BETA_URL = 'https://lifeverse-1stayz-demo1.bolt.host/beta';
 export function BetaQRPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-12">
-      <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-12 mb-8" />
+      <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-20 mb-6" />
 
       <div className="bg-stone-50 border border-stone-200 rounded-3xl p-10 flex flex-col items-center shadow-sm">
         <QRCodeSVG
@@ -27,3 +27,6 @@ export function BetaQRPage() {
     </div>
   );
 }
+
+
+export { BetaQRPage }
