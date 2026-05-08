@@ -1,23 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Settings, Download, Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Settings, Download, Loader2, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { BetaSignup } from '../lib/types';
 
 export function SettingsPage() {
   const [signups, setSignups] = useState<BetaSignup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState('');
+
+  const fetchAll = useCallback(async () => {
+    setLoading(true);
+    setFetchError('');
+    const { data, error } = await supabase
+      .from('beta_signups')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) setFetchError(error.message);
+    setSignups((data as BetaSignup[]) ?? []);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchAll() {
-      const { data } = await supabase
-        .from('beta_signups')
-        .select('*')
-        .order('created_at', { ascending: false });
-      setSignups((data as BetaSignup[]) ?? []);
-      setLoading(false);
-    }
     fetchAll();
-  }, []);
+  }, [fetchAll]);
 
   function downloadCSV() {
     const headers = ['Name', 'Email', 'Church', 'Role', 'Phone', 'Church Size', 'Notes', 'Signed Up'];
@@ -59,16 +64,29 @@ export function SettingsPage() {
             <h2 className="text-base font-semibold text-stone-800">Beta Signups</h2>
             <p className="text-xs text-stone-400 mt-0.5">{loading ? '...' : `${signups.length} total signups`}</p>
           </div>
-          <button
-            onClick={downloadCSV}
-            disabled={loading || signups.length === 0}
-            className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-[0.98] text-white text-sm font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download className="w-4 h-4" />
-            Export CSV
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchAll}
+              disabled={loading}
+              className="flex items-center gap-1.5 border border-stone-200 text-stone-500 hover:text-stone-700 hover:border-stone-300 text-sm font-medium px-3 py-2 rounded-xl transition-all disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+            <button
+              onClick={downloadCSV}
+              disabled={loading || signups.length === 0}
+              className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 active:scale-[0.98] text-white text-sm font-medium px-4 py-2 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
+          </div>
         </div>
 
+        {fetchError && (
+          <div className="px-5 py-3 bg-red-50 border-b border-red-100 text-xs text-red-600">{fetchError}</div>
+        )}
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-6 h-6 text-stone-300 animate-spin" />
