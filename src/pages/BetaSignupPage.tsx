@@ -68,7 +68,7 @@ export function BetaSignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-10 mx-auto mb-4" />
+          <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-30 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-stone-900 leading-tight">Join the Beta</h1>
           <p className="text-sm text-stone-500 mt-1">Help us build the future of visitor follow-up.</p>
         </div>
@@ -183,9 +183,9 @@ export function BetaSignupPage() {
           </button>
         </form>
 
-        <p className="text-xs text-stone-400 text-center mt-4">
-          Powered by Lifeverse Holdings
-        </p>
+        <div className="flex flex-col items-center mt-6">
+          <img src="/LifeversLogo.png" alt="Lifeverse Holdings" className="h-16 w-auto opacity-60" />
+        </div>
       </div>
     </div>
   );
