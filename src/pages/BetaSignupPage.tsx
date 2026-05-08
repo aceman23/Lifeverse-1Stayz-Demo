@@ -65,10 +65,10 @@ export function BetaSignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-start sm:items-center justify-center px-4 py-6 sm:py-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-30 mx-auto mb-4" />
+        <div className="text-center mb-4">
+          <img src="/LVHI_1Stayz.png" alt="1Stayz" className="h-20 mx-auto mb-2" />
           <h1 className="text-2xl font-bold text-stone-900 leading-tight">Join the Beta</h1>
           <p className="text-sm text-stone-500 mt-1">Help us build the future of visitor follow-up.</p>
         </div>
@@ -100,7 +100,7 @@ export function BetaSignupPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-stone-600 mb-1">Church</label>
               <input
@@ -125,7 +125,7 @@ export function BetaSignupPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-stone-600 mb-1">Phone</label>
               <input
