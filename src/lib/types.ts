@@ -25,6 +25,7 @@ export interface Visitor {
   assigned_pastor_id: string | null;
   ai_memory: Record<string, unknown>;
   notes: string | null;
+  video_url: string | null;
   created_at: string;
   updated_at: string;
   pastor?: Pastor;

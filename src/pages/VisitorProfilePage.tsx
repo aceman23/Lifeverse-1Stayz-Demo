@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, MoreHorizontal, Play, CheckCircle2, XCircle,
   Mail, MessageSquare, Video, Check, Sparkles, Coffee,
-  Calendar, Clock, User, MapPin, X,
+  Calendar, Clock, User, MapPin, X, Pause, Volume2, VolumeX,
+  Maximize2, Link, Pencil, AlertCircle,
 } from 'lucide-react';
 import { useVisitorDetails } from '../lib/hooks';
 import { formatDate } from '../lib/utils';
+import { supabase } from '../lib/supabase';
 import type { VisitorWithDetails } from '../lib/types';
 
 function initials(v: VisitorWithDetails) {
@@ -158,32 +160,306 @@ const CHANNEL_ICONS: Record<string, React.ReactNode> = {
   video: <Video className="w-3.5 h-3.5" />,
 };
 
-function VideoPanel({ visitor }: { visitor: VisitorWithDetails }) {
-  const [playing, setPlaying] = useState(false);
+function formatTime(seconds: number): string {
+  if (!isFinite(seconds)) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function VideoUrlModal({
+  current,
+  onSave,
+  onClose,
+}: {
+  current: string | null;
+  onSave: (url: string | null) => void;
+  onClose: () => void;
+}) {
+  const [value, setValue] = useState(current ?? '');
+  const [saving, setSaving] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 10);
+    return () => clearTimeout(t);
+  }, []);
+
+  function close() {
+    setVisible(false);
+    setTimeout(onClose, 180);
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    await onSave(value.trim() || null);
+    setSaving(false);
+    close();
+  }
+
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-[#1a2e2a] aspect-video w-full">
-      <img
-        src={visitor.avatar_url ?? 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600'}
-        alt={visitor.first_name}
-        className="w-full h-full object-cover opacity-80"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-      {!playing && (
-        <button
-          onClick={() => setPlaying(true)}
-          className="absolute inset-0 flex items-center justify-center group"
-        >
-          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:bg-white/30 transition-all">
-            <Play className="w-6 h-6 text-white fill-white ml-0.5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={close}>
+      <div
+        className={`bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transition-all duration-200 ${visible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="bg-stone-50 border-b border-stone-100 px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#1a2e2a] flex items-center justify-center shrink-0">
+              <Video className="w-3.5 h-3.5 text-[#2ec27e]" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-stone-800">Set Video Message</p>
+              <p className="text-xs text-stone-400">Paste a direct video URL (MP4, WebM, OGG)</p>
+            </div>
           </div>
+          <button onClick={close} className="text-stone-300 hover:text-stone-500 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="px-5 py-5 space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Video URL</label>
+            <div className="relative">
+              <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" />
+              <input
+                type="url"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="https://example.com/message.mp4"
+                className="w-full pl-9 pr-4 py-2.5 text-sm border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2ec27e]/30 focus:border-[#2ec27e] transition-all placeholder-stone-300"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3.5 py-2.5">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 leading-relaxed">
+              Supported formats: <span className="font-semibold">MP4 (H.264)</span>, <span className="font-semibold">WebM</span>, <span className="font-semibold">OGG</span>. The URL must be publicly accessible.
+            </p>
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-sm font-semibold py-2.5 rounded-xl transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {saving ? (
+                <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</>
+              ) : 'Save Video'}
+            </button>
+            {current && (
+              <button
+                onClick={() => { onSave(null); close(); }}
+                className="px-4 py-2.5 bg-stone-100 hover:bg-red-50 text-stone-600 hover:text-red-600 text-sm font-semibold rounded-xl transition-all"
+              >
+                Remove
+              </button>
+            )}
+            <button onClick={close} className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 text-sm font-semibold rounded-xl transition-all">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails; onVideoUrlChange: (url: string | null) => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [buffering, setBuffering] = useState(false);
+  const [error, setError] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(visitor.video_url ?? null);
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setVideoUrl(visitor.video_url ?? null);
+  }, [visitor.video_url]);
+
+  function togglePlay() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setPlaying(true); }
+    else { v.pause(); setPlaying(false); }
+  }
+
+  function toggleMute() {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+  }
+
+  function handleFullscreen() {
+    videoRef.current?.requestFullscreen?.();
+  }
+
+  function handleProgressClick(e: React.MouseEvent<HTMLDivElement>) {
+    const v = videoRef.current;
+    const bar = progressRef.current;
+    if (!v || !bar || !duration) return;
+    const rect = bar.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    v.currentTime = pct * duration;
+  }
+
+  async function handleSaveUrl(url: string | null) {
+    setVideoUrl(url);
+    setError(false);
+    setPlaying(false);
+    setCurrentTime(0);
+    onVideoUrlChange(url);
+    await supabase.from('visitors').update({ video_url: url }).eq('id', visitor.id);
+  }
+
+  if (!videoUrl) {
+    return (
+      <div className="relative rounded-2xl overflow-hidden bg-[#1a2e2a] aspect-video w-full flex flex-col items-center justify-center gap-3">
+        <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+          <Video className="w-6 h-6 text-white/50" />
+        </div>
+        <div className="text-center">
+          <p className="text-white/70 text-sm font-medium">No video message yet</p>
+          <p className="text-white/40 text-xs mt-0.5">Add a personal video for {visitor.first_name}</p>
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="mt-1 flex items-center gap-1.5 bg-[#2ec27e] hover:bg-[#28ae6e] text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all"
+        >
+          <Link className="w-3.5 h-3.5" />
+          Add Video URL
+        </button>
+        {showModal && (
+          <VideoUrlModal current={null} onSave={handleSaveUrl} onClose={() => setShowModal(false)} />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden bg-black aspect-video w-full group">
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        className="w-full h-full object-contain"
+        preload="metadata"
+        playsInline
+        onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime ?? 0)}
+        onDurationChange={() => setDuration(videoRef.current?.duration ?? 0)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+        onWaiting={() => setBuffering(true)}
+        onCanPlay={() => setBuffering(false)}
+        onError={() => { setError(true); setBuffering(false); }}
+      />
+
+      {/* Buffering spinner */}
+      {buffering && !error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <div className="w-10 h-10 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/60">
+          <AlertCircle className="w-8 h-8 text-red-400" />
+          <p className="text-white/80 text-sm">Could not load video</p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="text-xs text-[#2ec27e] hover:underline mt-1"
+          >
+            Change URL
+          </button>
+        </div>
+      )}
+
+      {/* Center play/pause on click */}
+      {!error && (
+        <button
+          onClick={togglePlay}
+          className="absolute inset-0 flex items-center justify-center"
+          aria-label={playing ? 'Pause' : 'Play'}
+        >
+          {!playing && (
+            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:bg-white/30 transition-all">
+              <Play className="w-6 h-6 text-white fill-white ml-0.5" />
+            </div>
+          )}
         </button>
       )}
-      <div className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-end justify-between">
-        <p className="text-white text-sm font-medium drop-shadow">
-          {visitor.first_name} — this message is for you.
-        </p>
-        <span className="text-white/70 text-xs">0:00 / 1:15</span>
+
+      {/* Bottom controls — always show on hover, always show when paused */}
+      <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent px-3 pb-3 pt-8 transition-opacity duration-200 ${playing ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
+        {/* Progress bar */}
+        <div
+          ref={progressRef}
+          onClick={handleProgressClick}
+          className="w-full h-1 bg-white/20 rounded-full cursor-pointer mb-2.5 relative"
+        >
+          <div
+            className="h-full bg-[#2ec27e] rounded-full transition-all"
+            style={{ width: duration > 0 ? `${(currentTime / duration) * 100}%` : '0%' }}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Play/Pause */}
+          <button onClick={togglePlay} className="text-white/90 hover:text-white transition-colors">
+            {playing
+              ? <Pause className="w-4 h-4 fill-white" />
+              : <Play className="w-4 h-4 fill-white ml-px" />
+            }
+          </button>
+
+          {/* Time */}
+          <span className="text-white/70 text-xs tabular-nums">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+
+          <div className="flex-1" />
+
+          {/* Visitor label */}
+          <p className="text-white/70 text-xs truncate max-w-[120px]">
+            {visitor.first_name} — this message is for you.
+          </p>
+
+          <div className="flex-1" />
+
+          {/* Mute */}
+          <button onClick={toggleMute} className="text-white/70 hover:text-white transition-colors">
+            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </button>
+
+          {/* Edit URL */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+            className="text-white/70 hover:text-white transition-colors"
+            title="Change video URL"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Fullscreen */}
+          <button onClick={handleFullscreen} className="text-white/70 hover:text-white transition-colors">
+            <Maximize2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
+
+      {showModal && (
+        <VideoUrlModal current={videoUrl} onSave={handleSaveUrl} onClose={() => setShowModal(false)} />
+      )}
     </div>
   );
 }
@@ -567,6 +843,7 @@ export function VisitorProfilePage() {
   const { visitor, loading } = useVisitorDetails(id ?? '');
   const [showCoffeeModal, setShowCoffeeModal] = useState(false);
   const [pressingCoffee, setPressingCoffee] = useState(false);
+  const [localVideoUrl, setLocalVideoUrl] = useState<string | null | undefined>(undefined);
 
   if (loading) {
     return (
@@ -595,6 +872,7 @@ export function VisitorProfilePage() {
 
   const whatWeKnow = getWhatWeKnow(visitor);
   const aiLearned = getAILearned(visitor);
+  const effectiveVideoUrl = localVideoUrl !== undefined ? localVideoUrl : (visitor.video_url ?? null);
 
   return (
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-12">
@@ -700,7 +978,10 @@ export function VisitorProfilePage() {
           {/* RIGHT COLUMN */}
           <div className="space-y-4">
             {/* Video panel */}
-            <VideoPanel visitor={visitor} />
+            <VideoPanel
+              visitor={{ ...visitor, video_url: effectiveVideoUrl }}
+              onVideoUrlChange={setLocalVideoUrl}
+            />
 
             {/* CTA + context */}
             <div className="bg-white border border-stone-100 rounded-2xl p-5">
