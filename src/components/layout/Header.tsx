@@ -1,14 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, ChevronDown, LogOut, LayoutDashboard } from 'lucide-react';
+import { Bell, ChevronDown, LogOut, LayoutDashboard, Menu } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
 
 interface HeaderProps {
   pageTitle?: string;
   pageSubtitle?: string;
-  breadcrumb?: string;
+  onMenuClick?: () => void;
 }
 
-export function Header({ pageTitle = 'DASHBOARD', pageSubtitle = 'System overview of your visitor engagement', breadcrumb = 'Dashboard' }: HeaderProps) {
+export function Header({
+  pageTitle = 'DASHBOARD',
+  pageSubtitle = 'System overview of your visitor engagement',
+  onMenuClick,
+}: HeaderProps) {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -32,22 +36,31 @@ export function Header({ pageTitle = 'DASHBOARD', pageSubtitle = 'System overvie
     .toUpperCase();
 
   return (
-    <header className="fixed top-0 left-56 right-0 z-50 bg-white border-b border-stone-100 shadow-sm">
-      <div className="h-14 flex items-center px-6 gap-4">
+    <header className="fixed top-0 left-0 right-0 md:left-56 z-40 bg-white border-b border-stone-100 shadow-sm">
+      <div className="h-14 flex items-center px-4 md:px-6 gap-3">
+        {/* Hamburger — mobile only */}
+        <button
+          onClick={onMenuClick}
+          className="md:hidden p-2 -ml-1 text-stone-500 hover:text-stone-800 transition-colors rounded-lg hover:bg-stone-50"
+          aria-label="Open menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
         {/* Breadcrumb + page info */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           <div className="flex items-center gap-2 text-xs text-stone-400">
             <span className="w-5 h-5 rounded-full bg-[#2ec27e] flex items-center justify-center shrink-0">
               <LayoutDashboard className="w-3 h-3 text-white" strokeWidth={2} />
             </span>
             <span className="font-semibold text-stone-700 text-xs tracking-wide">{pageTitle}</span>
           </div>
-          <span className="text-stone-300 text-xs">|</span>
-          <p className="text-xs text-stone-400 truncate">{pageSubtitle}</p>
+          <span className="hidden sm:block text-stone-300 text-xs">|</span>
+          <p className="hidden sm:block text-xs text-stone-400 truncate">{pageSubtitle}</p>
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
           <button className="relative p-2 text-stone-400 hover:text-stone-700 transition-colors rounded-lg hover:bg-stone-50">
             <Bell className="w-4.5 h-4.5" strokeWidth={1.75} />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full" />
@@ -61,8 +74,8 @@ export function Header({ pageTitle = 'DASHBOARD', pageSubtitle = 'System overvie
               <div className="w-8 h-8 rounded-full bg-[#1a2e2a] flex items-center justify-center text-white text-xs font-semibold shrink-0">
                 {initials}
               </div>
-              <span className="text-sm text-stone-700 font-medium max-w-[100px] truncate">{displayName}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-stone-400" />
+              <span className="hidden sm:block text-sm text-stone-700 font-medium max-w-[100px] truncate">{displayName}</span>
+              <ChevronDown className="hidden sm:block w-3.5 h-3.5 text-stone-400" />
             </button>
 
             {menuOpen && (

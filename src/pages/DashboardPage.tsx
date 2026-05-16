@@ -301,7 +301,7 @@ function AIRecommendationsPanel({ visitors }: { visitors: Visitor[] }) {
 
   if (active.length === 0) {
     return (
-      <div className="w-64 shrink-0 bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center justify-center py-10 px-4 gap-3">
+      <div className="w-full bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center justify-center py-10 px-4 gap-3">
         <CheckCircle2 className="w-8 h-8 text-[#2ec27e]" strokeWidth={1.5} />
         <p className="text-sm text-stone-500 text-center font-medium">All caught up!</p>
         <p className="text-xs text-stone-400 text-center">No pending recommendations.</p>
@@ -311,7 +311,7 @@ function AIRecommendationsPanel({ visitors }: { visitors: Visitor[] }) {
 
   return (
     <>
-      <div className="w-64 shrink-0 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+      <div className="w-full bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-stone-50">
           <span className="text-sm font-semibold text-stone-800">AI Recommendations</span>
           <div className="flex items-center gap-2">
@@ -450,20 +450,20 @@ export function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-stone-900 leading-tight">
+    <div className="min-h-screen bg-[#f5f6f8] px-4 md:px-6 pt-20 pb-10">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-stone-900 leading-tight">
           Save These Visitors.<br />Reap the Harvest Given to You.
         </h1>
         <p className="text-sm text-stone-400 mt-2">Agentic AI that recognizes, remembers, and responds.</p>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      {/* Stat cards — 1 col on xs, 3 cols on sm+ */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
         {statItems.map(({ value, label, sub, icon: Icon, iconBg, iconColor }) => (
           <div
             key={label}
-            className="bg-white rounded-2xl border border-stone-100 shadow-sm px-5 py-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 md:px-5 py-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer"
           >
             <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
               <Icon className={`w-5 h-5 ${iconColor}`} strokeWidth={1.75} />
@@ -481,7 +481,7 @@ export function DashboardPage() {
       <div className="mb-6">
         <div className="bg-[#1a2e2a] rounded-2xl overflow-hidden shadow-sm">
           <div className="flex items-stretch">
-            <div className="flex-1 px-6 py-5">
+            <div className="flex-1 px-4 md:px-6 py-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-white font-bold text-base">Follow-Up Engine</span>
                 <span className="bg-[#2ec27e] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide">Live</span>
@@ -495,10 +495,10 @@ export function DashboardPage() {
                 ))}
               </ul>
             </div>
-            <div className="w-36 flex items-center justify-center pr-6 shrink-0">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#2ec27e]/30 to-[#2ec27e]/10 border border-[#2ec27e]/30 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#2ec27e] to-[#1a8a57] flex items-center justify-center shadow-lg">
-                  <Zap className="w-7 h-7 text-white" strokeWidth={2} />
+            <div className="w-28 md:w-36 flex items-center justify-center pr-4 md:pr-6 shrink-0">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#2ec27e]/30 to-[#2ec27e]/10 border border-[#2ec27e]/30 flex items-center justify-center">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#2ec27e] to-[#1a8a57] flex items-center justify-center shadow-lg">
+                  <Zap className="w-6 h-6 md:w-7 md:h-7 text-white" strokeWidth={2} />
                 </div>
               </div>
             </div>
@@ -506,9 +506,9 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* People saved + AI recommendations */}
-      <div className="flex gap-4 items-start">
-        <div className="flex-1 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+      {/* People saved + AI recommendations — stacked on mobile, side by side on lg+ */}
+      <div className="flex flex-col lg:flex-row gap-4 items-start">
+        <div className="w-full lg:flex-1 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-stone-50">
             <span className="text-sm font-semibold text-stone-800">People We Saved From Leaving</span>
             <button onClick={() => navigate('/people')} className="text-xs text-[#2ec27e] font-semibold hover:underline">View all</button>
@@ -529,11 +529,13 @@ export function DashboardPage() {
         </div>
 
         {aiLoading ? (
-          <div className="w-64 shrink-0 bg-white rounded-2xl border border-stone-100 shadow-sm flex items-center justify-center min-h-[200px]">
+          <div className="w-full lg:w-64 lg:shrink-0 bg-white rounded-2xl border border-stone-100 shadow-sm flex items-center justify-center min-h-[200px]">
             <div className="w-8 h-8 border-2 border-[#2ec27e] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <AIRecommendationsPanel visitors={aiVisitors} />
+          <div className="w-full lg:w-64 lg:shrink-0">
+            <AIRecommendationsPanel visitors={aiVisitors} />
+          </div>
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './lib/auth';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -17,11 +18,13 @@ import { SettingsPage } from './pages/SettingsPage';
 import { VisitorProfilePage } from './pages/VisitorProfilePage';
 
 function AppShell() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#f5f6f8]">
-      <Sidebar />
-      <div className="pl-56">
-        <Header />
+      <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="md:pl-56">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
         <main>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
