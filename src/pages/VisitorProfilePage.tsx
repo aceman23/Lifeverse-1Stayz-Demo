@@ -181,7 +181,7 @@ function getYouTubeEmbedUrl(url: string): string | null {
         if (match) videoId = match[2];
       }
     }
-    return videoId ? `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1` : null;
+    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1` : null;
   } catch {
     return null;
   }
@@ -374,8 +374,9 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
         <iframe
           src={youtubeEmbedUrl}
           className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
           title={`Video for ${visitor.first_name}`}
         />
         <button
