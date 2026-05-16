@@ -367,18 +367,39 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
     );
   }
 
-  // YouTube — render iframe embed
+  // YouTube — thumbnail + open in new tab (iframe embeds are blocked in sandboxed preview environments)
   if (youtubeEmbedUrl) {
+    const videoId = youtubeEmbedUrl.match(/embed\/([^?]+)/)?.[1] ?? '';
+    const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
     return (
       <div className="relative rounded-2xl overflow-hidden bg-black aspect-video w-full group">
-        <iframe
-          src={youtubeEmbedUrl}
-          className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-          title={`Video for ${visitor.first_name}`}
+        <img
+          src={thumbnail}
+          alt={`Video for ${visitor.first_name}`}
+          className="w-full h-full object-cover"
         />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
+        {/* Play button */}
+        <a
+          href={watchUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute inset-0 flex items-center justify-center"
+          aria-label="Watch on YouTube"
+        >
+          <div className="w-16 h-16 rounded-full bg-[#FF0000] flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+            <Play className="w-7 h-7 text-white fill-white ml-1" />
+          </div>
+        </a>
+        {/* YouTube badge */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/60 rounded-lg px-2.5 py-1">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8z"/><polygon fill="white" points="9.7 15.5 15.8 12 9.7 8.5 9.7 15.5"/></svg>
+          <span className="text-white/90 text-xs font-medium">Watch on YouTube</span>
+        </div>
+        {/* Edit button */}
         <button
           onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
           className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 text-white/80 hover:text-white rounded-lg p-1.5"
