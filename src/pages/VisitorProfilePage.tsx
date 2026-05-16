@@ -913,7 +913,10 @@ export function VisitorProfilePage() {
 
   const whatWeKnow = getWhatWeKnow(visitor);
   const aiLearned = getAILearned(visitor);
-  const effectiveVideoUrl = localVideoUrl !== undefined ? localVideoUrl : (visitor.video_url ?? null);
+  const mariaFallback = visitor.first_name.toLowerCase() === 'maria'
+    ? 'https://youtu.be/ZOe3i9aQeEM?si=WD0Pd25rOtk5993k'
+    : null;
+  const effectiveVideoUrl = localVideoUrl !== undefined ? localVideoUrl : (visitor.video_url ?? mariaFallback);
 
   return (
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-12">
