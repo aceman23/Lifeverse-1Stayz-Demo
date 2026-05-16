@@ -167,6 +167,26 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let videoId: string | null = null;
+    if (u.hostname === 'youtu.be') {
+      videoId = u.pathname.slice(1).split('?')[0];
+    } else if (u.hostname.includes('youtube.com')) {
+      videoId = u.searchParams.get('v');
+      if (!videoId) {
+        // handle /embed/ and /shorts/
+        const match = u.pathname.match(/\/(embed|shorts)\/([^/?]+)/);
+        if (match) videoId = match[2];
+      }
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1` : null;
+  } catch {
+    return null;
+  }
+}
+
 function VideoUrlModal({
   current,
   onSave,
@@ -210,7 +230,7 @@ function VideoUrlModal({
             </div>
             <div>
               <p className="text-sm font-bold text-stone-800">Set Video Message</p>
-              <p className="text-xs text-stone-400">Paste a direct video URL (MP4, WebM, OGG)</p>
+              <p className="text-xs text-stone-400">Paste a YouTube link or direct video URL</p>
             </div>
           </div>
           <button onClick={close} className="text-stone-300 hover:text-stone-500 transition-colors">
@@ -237,7 +257,7 @@ function VideoUrlModal({
           <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3.5 py-2.5">
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700 leading-relaxed">
-              Supported formats: <span className="font-semibold">MP4 (H.264)</span>, <span className="font-semibold">WebM</span>, <span className="font-semibold">OGG</span>. The URL must be publicly accessible.
+              Supports <span className="font-semibold">YouTube links</span> (youtube.com, youtu.be) and direct video files: <span className="font-semibold">MP4</span>, <span className="font-semibold">WebM</span>, <span className="font-semibold">OGG</span>.
             </p>
           </div>
 
@@ -321,6 +341,8 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
     await supabase.from('visitors').update({ video_url: url }).eq('id', visitor.id);
   }
 
+  const youtubeEmbedUrl = videoUrl ? getYouTubeEmbedUrl(videoUrl) : null;
+
   if (!videoUrl) {
     return (
       <div className="relative rounded-2xl overflow-hidden bg-[#1a2e2a] aspect-video w-full flex flex-col items-center justify-center gap-3">
@@ -345,6 +367,32 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
     );
   }
 
+  // YouTube — render iframe embed
+  if (youtubeEmbedUrl) {
+    return (
+      <div className="relative rounded-2xl overflow-hidden bg-black aspect-video w-full group">
+        <iframe
+          src={youtubeEmbedUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title={`Video for ${visitor.first_name}`}
+        />
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 text-white/80 hover:text-white rounded-lg p-1.5"
+          title="Change video URL"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+        {showModal && (
+          <VideoUrlModal current={videoUrl} onSave={handleSaveUrl} onClose={() => setShowModal(false)} />
+        )}
+      </div>
+    );
+  }
+
+  // Direct video file
   return (
     <div className="relative rounded-2xl overflow-hidden bg-black aspect-video w-full group">
       <video
@@ -399,9 +447,8 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
         </button>
       )}
 
-      {/* Bottom controls — always show on hover, always show when paused */}
+      {/* Bottom controls */}
       <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent px-3 pb-3 pt-8 transition-opacity duration-200 ${playing ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
-        {/* Progress bar */}
         <div
           ref={progressRef}
           onClick={handleProgressClick}
@@ -414,7 +461,6 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Play/Pause */}
           <button onClick={togglePlay} className="text-white/90 hover:text-white transition-colors">
             {playing
               ? <Pause className="w-4 h-4 fill-white" />
@@ -422,26 +468,22 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
             }
           </button>
 
-          {/* Time */}
           <span className="text-white/70 text-xs tabular-nums">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
 
           <div className="flex-1" />
 
-          {/* Visitor label */}
           <p className="text-white/70 text-xs truncate max-w-[120px]">
             {visitor.first_name} — this message is for you.
           </p>
 
           <div className="flex-1" />
 
-          {/* Mute */}
           <button onClick={toggleMute} className="text-white/70 hover:text-white transition-colors">
             {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
 
-          {/* Edit URL */}
           <button
             onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
             className="text-white/70 hover:text-white transition-colors"
@@ -450,7 +492,6 @@ function VideoPanel({ visitor, onVideoUrlChange }: { visitor: VisitorWithDetails
             <Pencil className="w-3.5 h-3.5" />
           </button>
 
-          {/* Fullscreen */}
           <button onClick={handleFullscreen} className="text-white/70 hover:text-white transition-colors">
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
