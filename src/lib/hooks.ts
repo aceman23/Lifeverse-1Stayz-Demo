@@ -5,6 +5,8 @@ import type {
   VisitorWithDetails,
   DashboardStats,
   MeetingInvitation,
+  ChatSession,
+  ChatMessage,
 } from './types';
 
 export function useDashboardStats() {
@@ -218,4 +220,53 @@ export function useMeetingInvitation(visitorId: string) {
   }
 
   return { invitation, loading, selectTime };
+}
+
+export function useChatSessions() {
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSessions() {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .select('*, visitor:visitors(id, first_name, last_name, avatar_url), pastor:pastors(id, name)')
+        .order('last_message_at', { ascending: false });
+
+      if (error) console.error('[useChatSessions]', error);
+      setSessions((data as ChatSession[]) ?? []);
+      setLoading(false);
+    }
+    fetchSessions();
+  }, []);
+
+  return { sessions, loading };
+}
+
+export function useChatMessages(sessionId: string | null) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!sessionId) {
+      setMessages([]);
+      return;
+    }
+
+    setLoading(true);
+    async function fetchMessages() {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (error) console.error('[useChatMessages]', error);
+      setMessages((data as ChatMessage[]) ?? []);
+      setLoading(false);
+    }
+    fetchMessages();
+  }, [sessionId]);
+
+  return { messages, loading };
 }

@@ -148,10 +148,50 @@ export interface DashboardStats {
   concernsRaised: number;
 }
 
+export type ChatSessionStatus = 'active' | 'paused' | 'ended' | 'taken_over';
+
+export type ChatChannel = 'web_chat' | 'sms' | 'whatsapp' | 'email';
+
+export type ChatOutcome = 'resolved' | 'escalated' | 'no_action' | 'follow_up';
+
+export interface ChatSession {
+  id: string;
+  visitor_id: string;
+  channel: ChatChannel;
+  status: ChatSessionStatus;
+  ai_active: boolean;
+  taken_over_by: string | null;
+  taken_over_at: string | null;
+  summary: string | null;
+  outcome: ChatOutcome | null;
+  sentiment: string;
+  message_count: number;
+  started_at: string;
+  last_message_at: string;
+  created_at: string;
+  updated_at: string;
+  visitor?: Visitor;
+  pastor?: Pastor | null;
+}
+
+export type ChatSenderType = 'visitor' | 'ai' | 'pastor';
+
+export interface ChatMessage {
+  id: string;
+  session_id: string;
+  sender_type: ChatSenderType;
+  sender_pastor_id: string | null;
+  content: string;
+  sentiment: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface VisitorWithDetails extends Visitor {
   concerns?: Concern[];
   communication_events?: CommunicationEvent[];
   visit_events?: VisitEvent[];
   follow_up_sequences?: FollowUpSequence[];
   meeting_invitations?: MeetingInvitation[];
+  chat_sessions?: ChatSession[];
 }
