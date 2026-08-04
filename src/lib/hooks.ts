@@ -7,6 +7,9 @@ import type {
   MeetingInvitation,
   ChatSession,
   ChatMessage,
+  AIBot,
+  AIDocument,
+  AIGuardrail,
 } from './types';
 
 export function useDashboardStats() {
@@ -269,4 +272,81 @@ export function useChatMessages(sessionId: string | null) {
   }, [sessionId]);
 
   return { messages, loading };
+}
+
+export function useAIBots() {
+  const [bots, setBots] = useState<AIBot[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBots() {
+      const { data, error } = await supabase
+        .from('ai_bots')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) console.error('[useAIBots]', error);
+      setBots((data as AIBot[]) ?? []);
+      setLoading(false);
+    }
+    fetchBots();
+  }, []);
+
+  return { bots, loading };
+}
+
+export function useAIDocuments(botId: string | null) {
+  const [documents, setDocuments] = useState<AIDocument[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!botId) {
+      setDocuments([]);
+      return;
+    }
+
+    setLoading(true);
+    async function fetchDocs() {
+      const { data, error } = await supabase
+        .from('ai_documents')
+        .select('*')
+        .eq('bot_id', botId)
+        .order('created_at', { ascending: false });
+
+      if (error) console.error('[useAIDocuments]', error);
+      setDocuments((data as AIDocument[]) ?? []);
+      setLoading(false);
+    }
+    fetchDocs();
+  }, [botId]);
+
+  return { documents, loading };
+}
+
+export function useAIGuardrails(botId: string | null) {
+  const [guardrails, setGuardrails] = useState<AIGuardrail[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!botId) {
+      setGuardrails([]);
+      return;
+    }
+
+    setLoading(true);
+    async function fetchGuardrails() {
+      const { data, error } = await supabase
+        .from('ai_guardrails')
+        .select('*')
+        .eq('bot_id', botId)
+        .order('created_at', { ascending: false });
+
+      if (error) console.error('[useAIGuardrails]', error);
+      setGuardrails((data as AIGuardrail[]) ?? []);
+      setLoading(false);
+    }
+    fetchGuardrails();
+  }, [botId]);
+
+  return { guardrails, loading };
 }

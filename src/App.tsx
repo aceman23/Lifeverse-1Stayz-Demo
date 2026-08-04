@@ -11,6 +11,7 @@ import { BetaQRPage } from './pages/BetaQRPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { PeoplePage } from './pages/PeoplePage';
 import { ConversationsPage } from './pages/ConversationsPage';
+import { AITrainingPage } from './pages/AITrainingPage';
 import { FollowUpEnginePage } from './pages/FollowUpEnginePage';
 import { AppointmentsPage } from './pages/AppointmentsPage';
 import { InsightsPage } from './pages/InsightsPage';
@@ -30,6 +31,7 @@ function AppShell() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/people" element={<PeoplePage />} />
             <Route path="/conversations" element={<ConversationsPage />} />
+            <Route path="/ai-training" element={<AITrainingPage />} />
             <Route path="/follow-up-engine" element={<FollowUpEnginePage />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/insights" element={<InsightsPage />} />

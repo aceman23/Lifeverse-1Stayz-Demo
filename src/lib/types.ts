@@ -195,3 +195,57 @@ export interface VisitorWithDetails extends Visitor {
   meeting_invitations?: MeetingInvitation[];
   chat_sessions?: ChatSession[];
 }
+
+export type AIBotStatus = 'draft' | 'training' | 'active' | 'paused';
+
+export interface AIBot {
+  id: string;
+  name: string;
+  description: string | null;
+  persona_prompt: string;
+  status: AIBotStatus;
+  model: string;
+  tone_warmth: number;
+  tone_directness: number;
+  tone_formality: number;
+  scripture_use: number;
+  document_count: number;
+  guardrail_count: number;
+  last_trained_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AIDocumentStatus = 'pending' | 'processing' | 'indexed' | 'failed';
+
+export interface AIDocument {
+  id: string;
+  bot_id: string;
+  title: string;
+  file_type: string;
+  file_size_kb: number | null;
+  content_summary: string | null;
+  status: AIDocumentStatus;
+  tags: string[];
+  uploaded_by: string | null;
+  created_at: string;
+}
+
+export type GuardrailRuleType =
+  | 'blocked_topic'
+  | 'required_response'
+  | 'escalation_trigger'
+  | 'tone_constraint'
+  | 'content_boundary';
+
+export type GuardrailSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+export interface AIGuardrail {
+  id: string;
+  bot_id: string;
+  rule_type: GuardrailRuleType;
+  rule_text: string;
+  severity: GuardrailSeverity;
+  is_active: boolean;
+  created_at: string;
+}
