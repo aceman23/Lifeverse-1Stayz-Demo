@@ -38,7 +38,6 @@ function AppShell() {
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/visitor/:id" element={<VisitorProfilePage />} />
             <Route path="/people/:id" element={<VisitorProfilePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -59,6 +58,7 @@ export default function App() {
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/beta" element={<BetaSignupPage />} />
           <Route path="/beta/qr" element={<BetaQRPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route
             path="/*"
             element={
