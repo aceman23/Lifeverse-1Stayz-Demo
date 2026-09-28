@@ -171,6 +171,10 @@ export function LoginPage() {
           </p>
 
           <div className="flex items-center justify-center gap-4 mt-4">
+            <Link to="/onboarding" className="text-xs text-[#10B981] hover:text-[#0d9668] font-medium transition-colors">
+              Start onboarding
+            </Link>
+            <span className="text-stone-300">|</span>
             <Link to="/beta" className="text-xs text-teal-700 hover:text-teal-800 font-medium transition-colors">
               Join the Pilot
             </Link>

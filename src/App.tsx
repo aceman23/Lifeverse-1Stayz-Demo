@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './lib/auth';
+import { OnboardingProvider } from './lib/onboarding-context';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
@@ -17,6 +18,7 @@ import { AppointmentsPage } from './pages/AppointmentsPage';
 import { InsightsPage } from './pages/InsightsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { VisitorProfilePage } from './pages/VisitorProfilePage';
+import { OnboardingPage } from './pages/OnboardingPage';
 
 function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -36,6 +38,7 @@ function AppShell() {
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/visitor/:id" element={<VisitorProfilePage />} />
             <Route path="/people/:id" element={<VisitorProfilePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -49,6 +52,7 @@ function AppShell() {
 export default function App() {
   return (
     <AuthProvider>
+      <OnboardingProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -65,6 +69,7 @@ export default function App() {
           />
         </Routes>
       </BrowserRouter>
+      </OnboardingProvider>
     </AuthProvider>
   );
 }
