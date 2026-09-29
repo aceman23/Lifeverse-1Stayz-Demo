@@ -4,7 +4,6 @@ import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { ChatWidget } from '../components/ui/ChatWidget';
-import { createDemoState } from '../data/onboarding';
 import { SpecMarker } from '../components/ui/SpecMarker';
 
 export function LoginPage() {
@@ -39,14 +38,8 @@ export function LoginPage() {
   };
 
   const handleDemoLogin = () => {
-    const demoState = createDemoState();
-    try {
-      localStorage.setItem('1stayz_onboarding', JSON.stringify(demoState));
-    } catch {
-      // ignore
-    }
     enterDemoMode();
-    navigate('/today');
+    navigate('/onboarding');
   };
 
   return (
