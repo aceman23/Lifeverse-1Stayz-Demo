@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -10,15 +10,17 @@ import {
   BarChart2,
   Settings,
   X,
+  Sun,
 } from 'lucide-react';
 
 const navItems = [
+  { to: '/today', icon: Sun, label: 'Today', badge: 5, badgeColor: 'bg-rose-500' },
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/people', icon: Users, label: 'People' },
   { to: '/conversations', icon: MessageSquare, label: 'Conversations' },
   { to: '/ai-training', icon: Sparkles, label: 'AI Training' },
-  { to: '/follow-up-engine', icon: Zap, label: 'Follow-Up Engine' },
-  { to: '/appointments', icon: CalendarDays, label: 'Appointments' },
+  { to: '/follow-up-engine', icon: Zap, label: 'Follow-Up Engine', soon: true },
+  { to: '/appointments', icon: CalendarDays, label: 'Appointments', soon: true },
   { to: '/insights', icon: BarChart2, label: 'Insights' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
@@ -29,7 +31,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
-  // Close on route change (mobile)
   useEffect(() => {
     if (mobileOpen) onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -45,7 +46,6 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           className="h-auto w-auto object-contain brightness-0 invert"
           style={{ height: '10.5rem' }}
         />
-        {/* Close button — mobile only */}
         <button
           onClick={onClose}
           className="md:hidden text-white/50 hover:text-white transition-colors ml-2 shrink-0"
@@ -58,7 +58,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         <ul className="space-y-0.5">
-          {navItems.map(({ to, icon: Icon, label }) => (
+          {navItems.map(({ to, icon: Icon, label, badge, badgeColor, soon }) => (
             <li key={to}>
               <NavLink
                 to={to}
@@ -74,6 +74,16 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               >
                 <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} />
                 {label}
+                {badge !== undefined && (
+                  <span className={`ml-auto text-[10px] font-bold text-white ${badgeColor} px-1.5 py-0.5 rounded-full min-w-[18px] text-center`}>
+                    {badge}
+                  </span>
+                )}
+                {soon && (
+                  <span className="ml-auto text-[9px] font-medium text-white/40 bg-white/10 px-1.5 py-0.5 rounded">
+                    Soon
+                  </span>
+                )}
               </NavLink>
             </li>
           ))}
@@ -90,20 +100,12 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Desktop sidebar — always visible */}
       <div className="hidden md:flex fixed left-0 top-0 bottom-0 w-56 z-40 flex-col overflow-y-auto">
         {nav}
       </div>
-
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={onClose}
-          />
-          {/* Drawer */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
           <div className="relative w-56 flex flex-col shadow-2xl">
             {nav}
           </div>

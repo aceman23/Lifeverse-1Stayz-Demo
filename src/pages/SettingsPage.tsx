@@ -1,10 +1,32 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Settings, Download, Loader2, RefreshCw } from 'lucide-react';
+import { Download, Loader2, RefreshCw, Building2, Calendar, Shield, Users, MessageSquare, Plug, ToggleRight } from 'lucide-react';
 import type { BetaSignup } from '../lib/types';
+import { Step1Church } from '../components/onboarding/Step1Church';
+import { Step2Reading } from '../components/onboarding/Step2Reading';
+import { Step5Guardrails } from '../components/onboarding/Step5Guardrails';
+import { Step6Team } from '../components/onboarding/Step6Team';
+import { Step7Message } from '../components/onboarding/Step7Message';
+import { Step4Systems } from '../components/onboarding/Step4Systems';
+import { useOnboarding } from '../lib/onboarding-context';
+import { SpecMarker } from '../components/ui/SpecMarker';
 
 const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-beta-signups`;
 
+const TABS = [
+  { key: 'church', label: 'Church Profile', icon: Building2 },
+  { key: 'schedule', label: 'Service Schedule', icon: Calendar },
+  { key: 'guardrails', label: 'Guardrails', icon: Shield },
+  { key: 'team', label: 'Team & Escalations', icon: Users },
+  { key: 'message', label: 'First Message', icon: MessageSquare },
+  { key: 'integrations', label: 'Integrations', icon: Plug },
+  { key: 'mode', label: 'Mode', icon: ToggleRight },
+] as const;
+
+type TabKey = typeof TABS[number]['key'];
+
 export function SettingsPage() {
+  const { state, update } = useOnboarding();
+  const [activeTab, setActiveTab] = useState<TabKey>('church');
   const [signups, setSignups] = useState<BetaSignup[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
@@ -32,20 +54,12 @@ export function SettingsPage() {
   function downloadCSV() {
     const headers = ['Name', 'Email', 'Church', 'Role', 'Phone', 'Church Size', 'Notes', 'Signed Up'];
     const rows = signups.map(s => [
-      s.name,
-      s.email,
-      s.church,
-      s.role,
-      s.phone,
-      s.church_size,
-      s.notes,
+      s.name, s.email, s.church, s.role, s.phone, s.church_size, s.notes,
       new Date(s.created_at).toLocaleDateString(),
     ]);
-
     const csv = [headers, ...rows]
       .map(row => row.map(cell => `"${(cell ?? '').replace(/"/g, '""')}"`).join(','))
       .join('\n');
-
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -56,14 +70,79 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-10">
+    <div className="min-h-screen bg-[#f5f6f8] px-4 md:px-6 pt-20 pb-10">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-stone-900">Settings</h1>
         <p className="text-sm text-stone-400 mt-1">Configure your 1Stayz workspace and integrations.</p>
       </div>
 
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-1">
+        {TABS.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`inline-flex items-center gap-2 text-sm font-medium px-3.5 py-2 rounded-xl whitespace-nowrap transition-colors ${
+                activeTab === tab.key
+                  ? 'bg-white text-stone-900 border border-stone-100 shadow-sm'
+                  : 'text-stone-500 hover:text-stone-700 hover:bg-white/50'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab content */}
+      <SpecMarker id="settings.tabs">
+      <div className="max-w-[720px]">
+        {activeTab === 'church' && <Step1Church />}
+        {activeTab === 'schedule' && <Step2Reading />}
+        {activeTab === 'guardrails' && <Step5Guardrails />}
+        {activeTab === 'team' && <Step6Team />}
+        {activeTab === 'message' && <Step7Message />}
+        {activeTab === 'integrations' && <Step4Systems />}
+        {activeTab === 'mode' && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-xl font-semibold text-stone-900">Mode</h2>
+              <p className="text-sm text-stone-500 mt-1">Switch between Shadow and Live mode.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={() => update({ mode: 'shadow' })}
+                className={`text-left p-5 rounded-2xl border transition-all ${
+                  state.mode === 'shadow'
+                    ? 'bg-amber-50 border-amber-200'
+                    : 'bg-white border-stone-100 hover:border-stone-200'
+                }`}
+              >
+                <p className="text-sm font-semibold text-stone-900 mb-1">Shadow Mode</p>
+                <p className="text-xs text-stone-400">1Stayz writes every message but holds it for your approval.</p>
+              </button>
+              <button
+                onClick={() => update({ mode: 'live' })}
+                className={`text-left p-5 rounded-2xl border transition-all ${
+                  state.mode === 'live'
+                    ? 'bg-emerald-50 border-emerald-200'
+                    : 'bg-white border-stone-100 hover:border-stone-200'
+                }`}
+              >
+                <p className="text-sm font-semibold text-stone-900 mb-1">Live Mode</p>
+                <p className="text-xs text-stone-400">1Stayz sends messages automatically.</p>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      </SpecMarker>
+
       {/* Beta Signups Table */}
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden mb-6">
+      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden mt-8">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100">
           <div>
             <h2 className="text-base font-semibold text-stone-800">Pilot Signups</h2>
@@ -88,7 +167,6 @@ export function SettingsPage() {
             </button>
           </div>
         </div>
-
         {fetchError && (
           <div className="px-5 py-3 bg-red-50 border-b border-red-100 text-xs text-red-600">{fetchError}</div>
         )}
@@ -110,7 +188,6 @@ export function SettingsPage() {
                   <th className="px-5 py-3 font-medium text-stone-500 text-xs uppercase tracking-wide">Church</th>
                   <th className="px-5 py-3 font-medium text-stone-500 text-xs uppercase tracking-wide">Role</th>
                   <th className="px-5 py-3 font-medium text-stone-500 text-xs uppercase tracking-wide">Phone</th>
-                  <th className="px-5 py-3 font-medium text-stone-500 text-xs uppercase tracking-wide">Size</th>
                   <th className="px-5 py-3 font-medium text-stone-500 text-xs uppercase tracking-wide">Date</th>
                 </tr>
               </thead>
@@ -122,7 +199,6 @@ export function SettingsPage() {
                     <td className="px-5 py-3 text-stone-600 whitespace-nowrap">{s.church || '—'}</td>
                     <td className="px-5 py-3 text-stone-600 whitespace-nowrap">{s.role || '—'}</td>
                     <td className="px-5 py-3 text-stone-600 whitespace-nowrap">{s.phone || '—'}</td>
-                    <td className="px-5 py-3 text-stone-600 whitespace-nowrap">{s.church_size || '—'}</td>
                     <td className="px-5 py-3 text-stone-400 whitespace-nowrap">{new Date(s.created_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
@@ -130,17 +206,6 @@ export function SettingsPage() {
             </table>
           </div>
         )}
-      </div>
-
-      {/* Placeholder for future settings */}
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center justify-center py-16 gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-stone-50 flex items-center justify-center">
-          <Settings className="w-7 h-7 text-stone-500" strokeWidth={1.5} />
-        </div>
-        <p className="text-stone-500 font-medium">More settings coming soon</p>
-        <p className="text-sm text-stone-400 max-w-xs text-center">
-          Manage church profile, team members, notification preferences, and API integrations.
-        </p>
       </div>
     </div>
   );

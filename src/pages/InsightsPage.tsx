@@ -1,7 +1,9 @@
 import { BarChart2 } from 'lucide-react';
+import { SpecMarker } from '../components/ui/SpecMarker';
 
 export function InsightsPage() {
   return (
+    <SpecMarker id="insights">
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-10">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-stone-900">Insights</h1>
@@ -17,5 +19,6 @@ export function InsightsPage() {
         </p>
       </div>
     </div>
+    </SpecMarker>
   );
 }

@@ -1,4 +1,5 @@
-import { Video as LucideIcon, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface SourceCardProps {
   icon: LucideIcon;

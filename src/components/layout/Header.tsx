@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, ChevronDown, LogOut, LayoutDashboard, Menu } from 'lucide-react';
+import { Bell, ChevronDown, LogOut, LayoutDashboard, Menu, Eye, Zap, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
+import { useOnboarding } from '../../lib/onboarding-context';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   pageTitle?: string;
@@ -14,6 +16,7 @@ export function Header({
   onMenuClick,
 }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const { state } = useOnboarding();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -35,10 +38,18 @@ export function Header({
     .join('')
     .toUpperCase();
 
+  const mode = state.mode;
+  const modePill = mode === 'shadow'
+    ? { label: 'Shadow mode', icon: Eye, className: 'bg-amber-100 text-amber-700 border-amber-200' }
+    : mode === 'live'
+      ? { label: 'Live', icon: Zap, className: 'bg-emerald-100 text-emerald-700 border-emerald-200' }
+      : { label: 'Setup incomplete', icon: AlertCircle, className: 'bg-stone-100 text-stone-500 border-stone-200', link: '/onboarding' };
+
+  const ModeIcon = modePill.icon;
+
   return (
     <header className="fixed top-0 left-0 right-0 md:left-56 z-40 bg-white border-b border-stone-100 shadow-sm">
       <div className="h-14 flex items-center px-4 md:px-6 gap-3">
-        {/* Hamburger — mobile only */}
         <button
           onClick={onMenuClick}
           className="md:hidden p-2 -ml-1 text-stone-500 hover:text-stone-800 transition-colors rounded-lg hover:bg-stone-50"
@@ -47,7 +58,6 @@ export function Header({
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Breadcrumb + page info */}
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           <div className="flex items-center gap-2 text-xs text-stone-400">
             <span className="w-5 h-5 rounded-full bg-[#2ec27e] flex items-center justify-center shrink-0">
@@ -57,9 +67,21 @@ export function Header({
           </div>
           <span className="hidden sm:block text-stone-300 text-xs">|</span>
           <p className="hidden sm:block text-xs text-stone-400 truncate">{pageSubtitle}</p>
+
+          {/* Mode pill */}
+          {modePill.link ? (
+            <Link to={modePill.link} className={`ml-2 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${modePill.className} transition-colors hover:opacity-80`}>
+              <ModeIcon className="w-3 h-3" />
+              {modePill.label}
+            </Link>
+          ) : (
+            <span className={`ml-2 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${modePill.className}`}>
+              <ModeIcon className="w-3 h-3" />
+              {modePill.label}
+            </span>
+          )}
         </div>
 
-        {/* Right actions */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
           <button className="relative p-2 text-stone-400 hover:text-stone-700 transition-colors rounded-lg hover:bg-stone-50">
             <Bell className="w-4.5 h-4.5" strokeWidth={1.75} />

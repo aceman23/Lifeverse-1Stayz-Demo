@@ -1,14 +1,13 @@
 import { useOnboarding } from '../../lib/onboarding-context';
-import { Check, Smartphone, Mail, Phone, Clock, AlertCircle } from 'lucide-react';
+import { Check, Smartphone, Mail, Phone, Clock, AlertCircle, Lock } from 'lucide-react';
 
 export function Step4Systems() {
   const { state, update } = useOnboarding();
 
   const subsplashOptions = [
-    { value: 'none', label: 'Not connected', desc: 'We can set this up later' },
     { value: 'webhook', label: 'Webhook', desc: 'Direct integration' },
     { value: 'zapier', label: 'Zapier', desc: 'Connect through Zapier' },
-    { value: 'qrcard', label: 'QR card', desc: 'Guest scans a card at the door' },
+    { value: 'qrcard', label: '1Stayz connection card & QR', desc: 'Posts to Subsplash and 1Stayz' },
   ] as const;
 
   const emailOptions = [
@@ -17,6 +16,24 @@ export function Step4Systems() {
     { value: 'outlook', label: 'Outlook' },
     { value: '1stayz', label: '1Stayz email' },
   ] as const;
+
+  const disabledIntegrations = [
+    { label: 'Planning Center', desc: 'Service planning' },
+    { label: 'Google Calendar', desc: 'Staff scheduling' },
+    { label: 'Mailchimp', desc: 'Email campaigns' },
+  ];
+
+  const smsStatuses = ['submitted', 'pending', 'approved'] as const;
+  const smsLabels: Record<string, string> = {
+    submitted: 'Submitted to carrier',
+    pending: 'Pending carrier approval',
+    approved: 'Approved — text number active',
+  };
+  const smsColors: Record<string, string> = {
+    submitted: 'bg-stone-50 text-stone-600 border-stone-200',
+    pending: 'bg-amber-50 text-amber-700 border-amber-100',
+    approved: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  };
 
   return (
     <div className="space-y-6">
@@ -29,11 +46,15 @@ export function Step4Systems() {
 
       {/* Subsplash */}
       <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-1">
           <Smartphone className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Subsplash (Church App)</h3>
+          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+            Required
+          </span>
         </div>
-        <div className="grid grid-cols-2 gap-2.5">
+        <p className="text-xs text-stone-400 mb-4">Choose how 1Stayz connects to Subsplash.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           {subsplashOptions.map((opt) => {
             const selected = state.integrations.subsplash === opt.value;
             return (
@@ -59,6 +80,12 @@ export function Step4Systems() {
             );
           })}
         </div>
+        {state.integrations.subsplash === 'none' && (
+          <p className="text-xs text-rose-500 mt-3 flex items-center gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5" />
+            Subsplash connection is required before you can go live.
+          </p>
+        )}
       </div>
 
       {/* Email */}
@@ -93,24 +120,67 @@ export function Step4Systems() {
           <Phone className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Text Number</h3>
         </div>
-        <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-          <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-            <Clock className="w-4 h-4 text-amber-600" />
+        <div className={`flex items-center gap-3 p-4 rounded-xl border ${smsColors[state.integrations.smsStatus]}`}>
+          <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center shrink-0">
+            <Clock className="w-4 h-4 text-stone-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-stone-700">Pending carrier approval</p>
-            <p className="text-xs text-stone-400 mt-0.5">
-              Until your text number is approved, we'll reach out by email first. Typically 2-3 business days.
+            <p className="text-sm font-medium text-stone-700">{smsLabels[state.integrations.smsStatus]}</p>
+            <p className="text-xs text-stone-500 mt-0.5">
+              {state.integrations.smsStatus === 'approved'
+                ? 'Text messages are ready to send.'
+                : 'Until approved, we\'ll reach out by email first. Carrier registration timing varies.'}
             </p>
           </div>
         </div>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-xs text-stone-400">Demo: cycle status</span>
+          {smsStatuses.map((s) => (
+            <button
+              key={s}
+              onClick={() => update({ integrations: { ...state.integrations, smsStatus: s } })}
+              className={`text-[10px] font-medium px-2.5 py-1 rounded-full border transition-colors capitalize ${
+                state.integrations.smsStatus === s
+                  ? 'bg-stone-800 text-white border-stone-800'
+                  : 'bg-white text-stone-400 border-stone-200 hover:border-stone-300'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+        {state.integrations.smsStatus !== 'approved' && (
+          <label className="flex items-start gap-2.5 mt-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={state.integrations.emailFallbackAcknowledged}
+              onChange={(e) => update({ integrations: { ...state.integrations, emailFallbackAcknowledged: e.target.checked } })}
+              className="w-4 h-4 rounded accent-[#10B981] mt-0.5"
+            />
+            <span className="text-xs text-stone-500">
+              I understand 1Stayz will use email-first follow-up until the text number is approved.
+            </span>
+          </label>
+        )}
       </div>
 
-      <div className="flex items-start gap-2.5 p-4 bg-blue-50 border border-blue-100 rounded-xl">
-        <AlertCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-        <p className="text-xs text-blue-700 leading-relaxed">
-          You can skip this step and come back later — 1Stayz works with email follow-up until your text number is approved.
-        </p>
+      {/* Coming later */}
+      <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
+        <h3 className="text-sm font-semibold text-stone-800 mb-4">More integrations</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {disabledIntegrations.map((d) => (
+            <div key={d.label} className="p-4 rounded-xl border border-stone-100 bg-stone-50/30 opacity-60">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-medium text-stone-500">{d.label}</span>
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-stone-100 text-stone-400 inline-flex items-center gap-1">
+                  <Lock className="w-2.5 h-2.5" />
+                  Coming later
+                </span>
+              </div>
+              <p className="text-xs text-stone-400">{d.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

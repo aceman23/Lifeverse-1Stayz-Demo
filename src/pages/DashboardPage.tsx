@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, MessageCircle, UserCheck, ChevronRight, CheckCircle2,
-  Zap, ArrowLeft, Sparkles, X, Gift,
+  Zap, ArrowLeft, Sparkles, X, Gift, ArrowRight,
 } from 'lucide-react';
 import { useDashboardStats, useVisitorPipeline, useAIRecommendation } from '../lib/hooks';
+import { useOnboarding } from '../lib/onboarding-context';
+import { SpecMarker } from '../components/ui/SpecMarker';
 import type { Visitor } from '../lib/types';
 
 function fullName(v: Visitor) {
@@ -414,9 +416,12 @@ function VisitorRow({ visitor, onClick }: { visitor: Visitor; onClick: () => voi
 /* ── Dashboard page ─────────────────────────────────────────────── */
 export function DashboardPage() {
   const navigate = useNavigate();
+  const { state } = useOnboarding();
   const { stats, loading: statsLoading } = useDashboardStats();
   const { visitors, loading: visitorsLoading } = useVisitorPipeline();
   const { visitor: aiVisitor, loading: aiLoading } = useAIRecommendation();
+
+  const isShadow = state.mode === 'shadow';
 
   const aiVisitors = aiVisitor
     ? [aiVisitor, ...visitors.filter((v) => v.id !== aiVisitor.id)]
@@ -456,9 +461,17 @@ export function DashboardPage() {
           Save These Visitors.<br />Reap the Harvest Given to You.
         </h1>
         <p className="text-sm text-stone-400 mt-2">Agentic AI that recognizes, remembers, and responds.</p>
+        <button
+          onClick={() => navigate('/today')}
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#10B981] hover:text-[#0d9668] transition-colors"
+        >
+          Go to Today
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
 
-      {/* Stat cards — 1 col on xs, 3 cols on sm+ */}
+      {/* Stat cards */}
+      <SpecMarker id="dashboard.stats">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
         {statItems.map(({ value, label, sub, icon: Icon, iconBg, iconColor }) => (
           <div
@@ -476,20 +489,28 @@ export function DashboardPage() {
           </div>
         ))}
       </div>
+      </SpecMarker>
 
       {/* Follow-Up Engine live card */}
+      <SpecMarker id="dashboard.engine">
       <div className="mb-6">
         <div className="bg-[#1a2e2a] rounded-2xl overflow-hidden shadow-sm">
           <div className="flex items-stretch">
             <div className="flex-1 px-4 md:px-6 py-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-white font-bold text-base">Follow-Up Engine</span>
-                <span className="bg-[#2ec27e] text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide">Live</span>
+                <span className={`text-white text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide ${isShadow ? 'bg-amber-500' : 'bg-[#2ec27e]'}`}>
+                  {isShadow ? 'Shadow' : 'Live'}
+                </span>
               </div>
               <ul className="space-y-2">
-                {['Capturing visitors', 'Sending messages', 'Adapting channels', 'Scheduling meetings'].map((item) => (
+                {['Capturing visitors', isShadow ? 'Held for approval' : 'Sending messages', 'Adapting channels', 'Scheduling meetings'].map((item, i) => (
                   <li key={item} className="flex items-center gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#2ec27e] shrink-0" strokeWidth={2} />
+                    {i === 3 ? (
+                      <span className="text-[10px] font-medium text-white/40 bg-white/10 px-2 py-0.5 rounded-full">Coming soon</span>
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-[#2ec27e] shrink-0" strokeWidth={2} />
+                    )}
                     <span className="text-white/80 text-sm">{item}</span>
                   </li>
                 ))}
@@ -505,6 +526,7 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+      </SpecMarker>
 
       {/* People saved + AI recommendations — stacked on mobile, side by side on lg+ */}
       <div className="flex flex-col lg:flex-row gap-4 items-start">
@@ -533,9 +555,11 @@ export function DashboardPage() {
             <div className="w-8 h-8 border-2 border-[#2ec27e] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
+          <SpecMarker id="dashboard.recommendations">
           <div className="w-full lg:w-64 lg:shrink-0">
             <AIRecommendationsPanel visitors={aiVisitors} />
           </div>
+          </SpecMarker>
         )}
       </div>
     </div>

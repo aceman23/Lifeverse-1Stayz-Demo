@@ -1,6 +1,5 @@
 import { Coffee, MessageCircle, Heart, Users, Baby, ChevronRight } from 'lucide-react';
 import type { VisitorWithDetails } from '../../lib/types';
-import { timeAgo, formatDate } from '../../lib/utils';
 
 interface EngagementTimelineProps {
   visitor: VisitorWithDetails;

@@ -14,6 +14,7 @@ export interface ServiceRow {
   day: string;
   startTime: string;
   endTime: string;
+  reviewed: boolean;
 }
 
 export interface StaffMember {
@@ -46,15 +47,8 @@ export interface MessageTemplate {
   body: string;
 }
 
-export type OnboardingStep =
-  | 'church'
-  | 'reading'
-  | 'needs'
-  | 'systems'
-  | 'guardrails'
-  | 'team'
-  | 'message'
-  | 'ready';
+export type FirstMessageStatus = 'draft' | 'awaiting' | 'approved';
+export type SmsStatus = 'submitted' | 'pending' | 'approved';
 
 export interface OnboardingState {
   currentStep: number;
@@ -71,7 +65,11 @@ export interface OnboardingState {
   integrations: {
     subsplash: 'none' | 'webhook' | 'zapier' | 'qrcard';
     email: 'none' | 'gmail' | 'outlook' | '1stayz';
-    smsStatus: 'pending' | 'approved';
+    smsStatus: SmsStatus;
+  emailFallbackAcknowledged: boolean;
+  shadowSundayCompleted: boolean;
+    consentWordingLive: boolean;
+  shadowSundayAcknowledged: boolean;
   };
 
   documents: { id: string; name: string; type: string }[];
@@ -79,7 +77,11 @@ export interface OnboardingState {
   escalationTopics: EscalationTopic[];
   tone: string[];
   signOff: string;
-  firstMessageApproved: boolean;
+
+  guardrailsApprovedBy: string | null;
+  guardrailsApprovedAt: string | null;
+
+  firstMessageStatus: FirstMessageStatus;
   firstMessageApprovedBy: string | null;
   firstMessageApprovedAt: string | null;
 
@@ -220,6 +222,15 @@ export const NEEDS_SOON = [
   { emoji: '🎥', label: 'Personal video welcome' },
 ];
 
+export const LOCKED_RULES = [
+  'One question per message',
+  'Short texts (max 2 SMS)',
+  'Always says it\'s an assistant',
+  'Honors STOP instantly',
+];
+
+export const CONSENT_WORDING = "By sharing your mobile number, you agree to receive text messages from {church_name}, sent by 1Stayz on the church's behalf, about your visit and next steps. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help.";
+
 export function createInitialState(): OnboardingState {
   return {
     currentStep: 0,
@@ -241,7 +252,11 @@ export function createInitialState(): OnboardingState {
     integrations: {
       subsplash: 'none',
       email: 'none',
-      smsStatus: 'pending',
+      smsStatus: 'submitted',
+      emailFallbackAcknowledged: false,
+      shadowSundayCompleted: false,
+      consentWordingLive: false,
+      shadowSundayAcknowledged: false,
     },
     documents: [],
     doctrinalPositions: DEFAULT_DOCTRINAL_TOPICS.map((topic, i) => ({
@@ -257,7 +272,9 @@ export function createInitialState(): OnboardingState {
     })),
     tone: ['Warm'],
     signOff: 'The team at Grace Community Church',
-    firstMessageApproved: false,
+    guardrailsApprovedBy: null,
+    guardrailsApprovedAt: null,
+    firstMessageStatus: 'draft',
     firstMessageApprovedBy: null,
     firstMessageApprovedAt: null,
     staff: [
@@ -275,5 +292,42 @@ export function createInitialState(): OnboardingState {
     templates: DEFAULT_TEMPLATES,
     mode: null,
     readyCheck: {},
+  };
+}
+
+export function createDemoState(): OnboardingState {
+  const base = createInitialState();
+  return {
+    ...base,
+    currentStep: 7,
+    completed: true,
+    church: {
+      name: 'Grace Community Church',
+      website: 'gracecommunity.org',
+      address: '123 Main St, Springfield, IL 62701',
+      timezone: 'America/Chicago (CT)',
+      phone: '(555) 123-4567',
+      yourName: 'Pastor Ray',
+      yourRole: 'Senior Pastor',
+    },
+    serviceSchedule: [
+      { id: 'svc-1', name: 'Sunday Morning First Service', day: 'Sunday', startTime: '09:00', endTime: '10:15', reviewed: true },
+      { id: 'svc-2', name: 'Sunday Morning Second Service', day: 'Sunday', startTime: '11:00', endTime: '12:15', reviewed: true },
+    ],
+    needs: ['Follow up with every first-time guest', 'Get alerted when someone needs a pastor'],
+    integrations: {
+      ...base.integrations,
+      subsplash: 'qrcard',
+      email: '1stayz',
+      smsStatus: 'approved',
+      consentWordingLive: true,
+    },
+    guardrailsApprovedBy: 'Pastor Ray',
+    guardrailsApprovedAt: new Date().toISOString(),
+    firstMessageStatus: 'approved',
+    firstMessageApprovedBy: 'Pastor Ray',
+    firstMessageApprovedAt: new Date().toISOString(),
+    staffAlertsConsent: true,
+    mode: 'shadow',
   };
 }

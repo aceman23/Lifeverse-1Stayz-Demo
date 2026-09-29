@@ -1,13 +1,17 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { ChatWidget } from '../components/ui/ChatWidget';
+import { createDemoState } from '../data/onboarding';
+import { SpecMarker } from '../components/ui/SpecMarker';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session, loading: authLoading, demoMode, enterDemoMode } = useAuth();
+  const savedMessage = (location.state as { savedMessage?: string } | null)?.savedMessage;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +19,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (!authLoading && (session || demoMode)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/today" replace />;
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -31,12 +35,18 @@ export function LoginPage() {
       return;
     }
 
-    navigate('/');
+    navigate('/today');
   };
 
   const handleDemoLogin = () => {
+    const demoState = createDemoState();
+    try {
+      localStorage.setItem('1stayz_onboarding', JSON.stringify(demoState));
+    } catch {
+      // ignore
+    }
     enterDemoMode();
-    navigate('/');
+    navigate('/today');
   };
 
   return (
@@ -77,6 +87,13 @@ export function LoginPage() {
             <h1 className="text-2xl font-semibold text-stone-900 mb-1.5">Welcome back</h1>
             <p className="text-sm text-stone-500">Sign in to your Agentic AI digital assistants account.</p>
           </div>
+
+          {savedMessage && (
+            <div className="flex items-start gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 mb-5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-emerald-700">{savedMessage}</p>
+            </div>
+          )}
 
           {error && (
             <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 rounded-xl p-3.5 mb-5">
@@ -153,6 +170,7 @@ export function LoginPage() {
             </div>
           </div>
 
+          <SpecMarker id="login.demo">
           <button
             type="button"
             onClick={handleDemoLogin}
@@ -162,6 +180,7 @@ export function LoginPage() {
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             Try Demo Account
           </button>
+          </SpecMarker>
 
           <p className="text-sm text-stone-500 text-center mt-6">
             Don&apos;t have an account?{' '}

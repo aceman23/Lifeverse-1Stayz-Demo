@@ -1,5 +1,5 @@
 import { useOnboarding } from '../../lib/onboarding-context';
-import { Plus, Trash2, GripVertical, Bell, Clock, Phone, Check } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Bell, Clock, Phone, Check, Shield } from 'lucide-react';
 import type { StaffMember } from '../../data/onboarding';
 
 export function Step6Team() {
@@ -72,20 +72,20 @@ export function Step6Team() {
         <div className="space-y-3">
           {state.staff.map((s) => (
             <div key={s.id} className="border border-stone-100 rounded-xl p-4 space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
                   value={s.name}
                   onChange={(e) => updateStaff(s.id, { name: e.target.value })}
                   placeholder="Name"
-                  className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+                  className="flex-1 min-w-[120px] text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
                 />
                 <input
                   type="text"
                   value={s.role}
                   onChange={(e) => updateStaff(s.id, { role: e.target.value })}
                   placeholder="Role"
-                  className="w-40 text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+                  className="flex-1 min-w-[100px] text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
                 />
                 <button
                   onClick={() => deleteStaff(s.id)}
@@ -94,20 +94,20 @@ export function Step6Team() {
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="tel"
                   value={s.mobile}
                   onChange={(e) => updateStaff(s.id, { mobile: e.target.value })}
                   placeholder="Mobile"
-                  className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+                  className="flex-1 min-w-[120px] text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
                 />
                 <input
                   type="email"
                   value={s.email}
                   onChange={(e) => updateStaff(s.id, { email: e.target.value })}
                   placeholder="Email"
-                  className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+                  className="flex-1 min-w-[120px] text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
                 />
               </div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -169,13 +169,23 @@ export function Step6Team() {
         </div>
       </div>
 
+      {/* 15-minute badge */}
+      <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+          <Shield className="w-4 h-4 text-blue-600" />
+        </div>
+        <p className="text-sm text-blue-700 font-medium">
+          A human replies to escalations within 15 minutes
+        </p>
+      </div>
+
       {/* Quiet hours */}
       <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
         <div className="flex items-center gap-2 mb-1">
           <Clock className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Quiet Hours</h3>
         </div>
-        <p className="text-xs text-stone-400 mb-4">No automated texts during these hours in your local time zone.</p>
+        <p className="text-xs text-stone-400 mb-4">No automated texts during these hours in the GUEST's local time.</p>
         <div className="flex items-center gap-3">
           <div>
             <label className="text-xs text-stone-500 mb-1 block">Start</label>
@@ -239,6 +249,7 @@ export function Step6Team() {
                 />
                 <span className="text-xs text-stone-500">
                   I confirm that staff members have consented to receive SMS alerts at this number.
+                  <span className="text-rose-500 font-medium"> Required to continue.</span>
                 </span>
               </label>
             </>

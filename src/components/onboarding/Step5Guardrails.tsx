@@ -1,14 +1,18 @@
+import { useRef } from 'react';
 import { useOnboarding } from '../../lib/onboarding-context';
-import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, MessageSquare, Sliders, Check } from 'lucide-react';
+import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, Sliders, Check, Lock, CheckCircle2, Sparkles } from 'lucide-react';
 import type { DoctrinalPosition } from '../../data/onboarding';
-
+import { LOCKED_RULES } from '../../data/onboarding';
 
 export function Step5Guardrails() {
   const { state, update } = useOnboarding();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function updatePosition(id: string, patch: Partial<DoctrinalPosition>) {
     update({
       doctrinalPositions: state.doctrinalPositions.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+      guardrailsApprovedBy: null,
+      guardrailsApprovedAt: null,
     });
   }
 
@@ -20,9 +24,21 @@ export function Step5Guardrails() {
     update({ documents: state.documents.filter((d) => d.id !== id) });
   }
 
+  function handleFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const newDocs = Array.from(files).map((f) => ({
+      id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: f.name,
+      type: f.name.split('.').pop() || 'txt',
+    }));
+    update({ documents: [...state.documents, ...newDocs] });
+  }
+
   function toggleEscalation(id: string) {
     update({
       escalationTopics: state.escalationTopics.map((e) => (e.id === id ? { ...e, enabled: !e.enabled } : e)),
+      guardrailsApprovedBy: null,
+      guardrailsApprovedAt: null,
     });
   }
 
@@ -33,6 +49,15 @@ export function Step5Guardrails() {
       update({ tone: [...state.tone, t] });
     }
   }
+
+  function approveGuardrails() {
+    update({
+      guardrailsApprovedBy: state.church.yourName || 'Pastor',
+      guardrailsApprovedAt: new Date().toISOString(),
+    });
+  }
+
+  const guardrailsApproved = !!state.guardrailsApprovedBy;
 
   return (
     <div className="space-y-6">
@@ -50,34 +75,51 @@ export function Step5Guardrails() {
           <h3 className="text-sm font-semibold text-stone-800">Training Documents</h3>
         </div>
         <p className="text-xs text-stone-400 mb-4">Upload sermons, policies, core messaging — anything the AI should know.</p>
-        <div className="border-2 border-dashed border-stone-200 rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#10B981] transition-colors mb-3">
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.docx,.txt,.md"
+          className="hidden"
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="border-2 border-dashed border-stone-200 rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#10B981] transition-colors mb-3"
+        >
           <Upload className="w-6 h-6 text-stone-300" />
           <p className="text-sm text-stone-500">Drop files here or click to browse</p>
           <p className="text-xs text-stone-400">PDF, DOCX, TXT, Markdown</p>
         </div>
         {state.documents.length > 0 && (
-          <div className="space-y-2">
-            {state.documents.map((doc) => (
-              <div key={doc.id} className="flex items-center gap-3 p-3 bg-stone-50/50 rounded-xl">
-                <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4" />
+          <>
+            <div className="space-y-2">
+              {state.documents.map((doc) => (
+                <div key={doc.id} className="flex items-center gap-3 p-3 bg-stone-50/50 rounded-xl">
+                  <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    value={doc.name}
+                    onChange={(e) => updateDoc(doc.id, { name: e.target.value })}
+                    placeholder="Document name"
+                    className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+                  />
+                  <button
+                    onClick={() => deleteDoc(doc.id)}
+                    className="p-2 text-stone-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  value={doc.name}
-                  onChange={(e) => updateDoc(doc.id, { name: e.target.value })}
-                  placeholder="Document name"
-                  className="flex-1 text-sm border border-stone-200 rounded-lg px-3 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
-                />
-                <button
-                  onClick={() => deleteDoc(doc.id)}
-                  className="p-2 text-stone-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <p className="text-xs text-emerald-600 mt-3 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              We found 9 positions in your documents.
+            </p>
+          </>
         )}
       </div>
 
@@ -88,7 +130,7 @@ export function Step5Guardrails() {
           <h3 className="text-sm font-semibold text-stone-800">Doctrinal Positions</h3>
         </div>
         <p className="text-xs text-stone-400 mb-4">
-          For each topic, choose whether your assistant should explain your church's view, route to a pastor, or skip it.
+          For each topic, choose whether your assistant should explain your church's view, route to a pastor, or not discuss it.
         </p>
         <div className="space-y-3">
           {state.doctrinalPositions.map((pos) => (
@@ -100,7 +142,7 @@ export function Step5Guardrails() {
                     <button
                       key={stance}
                       onClick={() => updatePosition(pos.id, { stance })}
-                      className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors capitalize ${
+                      className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
                         pos.stance === stance
                           ? stance === 'explain'
                             ? 'bg-emerald-100 text-emerald-700'
@@ -112,7 +154,7 @@ export function Step5Guardrails() {
                     >
                       {stance === 'explain' && 'Explain'}
                       {stance === 'route' && 'Route to pastor'}
-                      {stance === 'skip' && 'Skip'}
+                      {stance === 'skip' && "Don't discuss"}
                     </button>
                   ))}
                 </div>
@@ -133,6 +175,23 @@ export function Step5Guardrails() {
                 </p>
               )}
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Locked rules */}
+      <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Lock className="w-4 h-4 text-stone-400" />
+          <h3 className="text-sm font-semibold text-stone-800">Locked Rules</h3>
+        </div>
+        <p className="text-xs text-stone-400 mb-4">These rules are always on and can't be changed.</p>
+        <div className="flex flex-wrap gap-2">
+          {LOCKED_RULES.map((rule) => (
+            <span key={rule} className="text-xs font-medium px-3.5 py-2 rounded-full bg-stone-100 text-stone-500 border border-stone-200 inline-flex items-center gap-1.5">
+              <Lock className="w-3 h-3 text-stone-400" />
+              {rule}
+            </span>
           ))}
         </div>
       </div>
@@ -202,6 +261,30 @@ export function Step5Guardrails() {
             className="w-full text-sm border border-stone-200 rounded-lg px-3.5 py-2.5 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
           />
         </div>
+      </div>
+
+      {/* Pastor approval */}
+      <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
+        <h3 className="text-sm font-semibold text-stone-800 mb-4">Pastor Approval</h3>
+        {guardrailsApproved ? (
+          <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-xl">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-stone-800">Guardrails approved by {state.guardrailsApprovedBy}</p>
+              <p className="text-xs text-stone-400 mt-0.5">
+                {state.guardrailsApprovedAt && new Date(state.guardrailsApprovedAt).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={approveGuardrails}
+            className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl bg-[#1a2e2a] text-white hover:bg-[#245045] transition-colors"
+          >
+            <Check className="w-4 h-4" />
+            Approve guardrails as pastor
+          </button>
+        )}
       </div>
     </div>
   );

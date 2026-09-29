@@ -249,3 +249,15 @@ export interface AIGuardrail {
   is_active: boolean;
   created_at: string;
 }
+
+export interface BetaSignup {
+  id: string;
+  name: string;
+  email: string;
+  church: string;
+  role: string;
+  phone: string;
+  church_size: string;
+  notes: string;
+  created_at: string;
+}

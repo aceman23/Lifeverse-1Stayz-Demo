@@ -1,7 +1,9 @@
 import { CalendarDays } from 'lucide-react';
+import { SpecMarker } from '../components/ui/SpecMarker';
 
 export function AppointmentsPage() {
   return (
+    <SpecMarker id="appointments">
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-10">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-stone-900">Appointments</h1>
@@ -17,5 +19,6 @@ export function AppointmentsPage() {
         </p>
       </div>
     </div>
+    </SpecMarker>
   );
 }

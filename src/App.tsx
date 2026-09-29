@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './lib/auth';
 import { OnboardingProvider } from './lib/onboarding-context';
+import { SpecModeProvider } from './lib/spec-mode-context';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
@@ -19,6 +20,8 @@ import { InsightsPage } from './pages/InsightsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { VisitorProfilePage } from './pages/VisitorProfilePage';
 import { OnboardingPage } from './pages/OnboardingPage';
+import { TodayPage } from './pages/TodayPage';
+import { SpecModeToggle, SpecPanel } from './components/ui/SpecMarker';
 
 function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,6 +33,7 @@ function AppShell() {
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main>
           <Routes>
+            <Route path="/today" element={<TodayPage />} />
             <Route path="/" element={<DashboardPage />} />
             <Route path="/people" element={<PeoplePage />} />
             <Route path="/conversations" element={<ConversationsPage />} />
@@ -44,6 +48,7 @@ function AppShell() {
           </Routes>
         </main>
       </div>
+      <SpecPanel />
     </div>
   );
 }
@@ -52,23 +57,26 @@ export default function App() {
   return (
     <AuthProvider>
       <OnboardingProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/sign-up" element={<SignUpPage />} />
-          <Route path="/beta" element={<BetaSignupPage />} />
-          <Route path="/beta/qr" element={<BetaQRPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <AppShell />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+        <SpecModeProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/sign-up" element={<SignUpPage />} />
+              <Route path="/beta" element={<BetaSignupPage />} />
+              <Route path="/beta/qr" element={<BetaQRPage />} />
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <AppShell />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+            <SpecModeToggle />
+          </BrowserRouter>
+        </SpecModeProvider>
       </OnboardingProvider>
     </AuthProvider>
   );
