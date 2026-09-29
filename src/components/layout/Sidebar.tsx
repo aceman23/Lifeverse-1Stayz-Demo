@@ -1,16 +1,8 @@
 import { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Users,
-  MessageSquare,
-  Sparkles,
-  Zap,
-  CalendarDays,
-  BarChart2,
-  Settings,
-  X,
-  Sun,
+  LayoutDashboard, Users, MessageSquare, Sparkles, Zap,
+  CalendarDays, BarChart2, Settings as SettingsIcon, X, Sun,
 } from 'lucide-react';
 import { useOnboarding } from '../../lib/onboarding-context';
 import { escalations, todayTasks } from '../../data/today';
@@ -24,7 +16,7 @@ const navItems = [
   { to: '/follow-up-engine', icon: Zap, label: 'Follow-Up Engine', soon: true },
   { to: '/appointments', icon: CalendarDays, label: 'Appointments', soon: true },
   { to: '/insights', icon: BarChart2, label: 'Insights' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
 interface SidebarProps {
@@ -34,7 +26,6 @@ interface SidebarProps {
 
 export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const { state } = useOnboarding();
-
   const todayBadge = escalations.length + (state.mode === 'shadow' ? todayTasks.filter((t) => t.status === 'approval').length : 0);
 
   useEffect(() => {
@@ -43,8 +34,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   }, []);
 
   const nav = (
-    <aside className="flex flex-col h-full bg-[#1a2e2a] w-56">
-      {/* Brand */}
+    <aside className="flex flex-col h-full w-56" style={{ background: 'var(--text-primary)' }}>
       <div className="px-4 pt-5 pb-4 border-b border-white/10 flex items-center justify-between">
         <img
           src="/LVHI_1Stayz.png"
@@ -61,46 +51,48 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         </button>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         <ul className="space-y-0.5">
           {navItems.map(({ to, icon: Icon, label, soon }) => {
             const badge = to === '/today' ? todayBadge : undefined;
-            const badgeColor = 'bg-rose-500';
             return (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end={to === '/'}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                    isActive
-                      ? 'bg-[#2ec27e]/20 text-[#2ec27e] font-medium'
-                      : 'text-white/60 hover:bg-white/8 hover:text-white'
-                  }`
-                }
-              >
-                <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} />
-                {label}
-                {badge !== undefined && badge > 0 && (
-                  <span className={`ml-auto text-[10px] font-bold text-white ${badgeColor} px-1.5 py-0.5 rounded-full min-w-[18px] text-center`}>
-                    {badge}
-                  </span>
-                )}
-                {soon && (
-                  <span className="ml-auto text-[9px] font-medium text-white/40 bg-white/10 px-1.5 py-0.5 rounded">
-                    Soon
-                  </span>
-                )}
-              </NavLink>
-            </li>
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  end={to === '/'}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+                      isActive
+                        ? 'text-white font-medium'
+                        : 'text-white/70 hover:text-white'
+                    }`
+                  }
+                  style={({ isActive }) => isActive ? { background: 'rgba(255,255,255,0.08)' } : {}}
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} style={isActive ? { color: 'var(--brand-teal)' } : {}} />
+                      {label}
+                      {badge !== undefined && badge > 0 && (
+                        <span className="ml-auto text-[10px] font-bold text-white px-1.5 py-0.5 rounded-full min-w-[18px] text-center" style={{ background: 'var(--danger)' }}>
+                          {badge}
+                        </span>
+                      )}
+                      {soon && (
+                        <span className="ml-auto text-[9px] font-medium text-white/40 bg-white/10 px-1.5 py-0.5 rounded">
+                          Soon
+                        </span>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              </li>
             );
           })}
         </ul>
       </nav>
 
-      {/* Footer */}
       <div className="px-4 py-4 border-t border-white/10 flex items-center justify-between">
         <p className="text-white/40 text-xs">1Stayz by Lifeverse</p>
         <span className="text-white/25 text-[10px] font-mono tracking-wide">v{__APP_VERSION__}</span>

@@ -100,6 +100,12 @@ export function ChatWidget({ context = 'auth' }: ChatWidgetProps) {
   }, [open]);
 
   useEffect(() => {
+    function onOpenReq() { setOpen(true); }
+    window.addEventListener('open-chat-widget', onOpenReq);
+    return () => window.removeEventListener('open-chat-widget', onOpenReq);
+  }, []);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 

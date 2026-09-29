@@ -10,6 +10,13 @@ export interface TodayTask {
   status: 'escalation' | 'approval' | 'follow-up' | 'risk' | 'returning' | 'prep' | 'done';
   channel?: string;
   draftMessage?: string;
+  quote?: string;
+  summary?: string;
+  factChips?: string[];
+  whyText?: string;
+  visitDate?: string;
+  serviceName?: string;
+  meta?: string;
 }
 
 export interface TodayLeader {
@@ -31,6 +38,12 @@ export interface Escalation {
   reason: string;
   openedAt: string;
   channel: string;
+  quote?: string;
+  summary?: string;
+  factChips?: string[];
+  whyText?: string;
+  visitDate?: string;
+  serviceName?: string;
 }
 
 export interface PilotHealthItem {
@@ -48,16 +61,113 @@ export interface AgentActivityItem {
 }
 
 export const escalations: Escalation[] = [
-  { id: 'esc1', guestName: 'Sarah Johnson', guestInitials: 'SJ', avatarColor: 'from-rose-400 to-rose-600', reason: 'Shared a concern about feeling unseen. Needs a pastor to reply.', openedAt: new Date(Date.now() - 3 * 60 * 1000).toISOString(), channel: 'SMS' },
+  {
+    id: 'esc1',
+    guestName: 'Sarah Johnson',
+    guestInitials: 'SJ',
+    avatarColor: 'from-rose-400 to-rose-600',
+    reason: 'Shared a concern about feeling unseen. Needs a pastor to reply.',
+    openedAt: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+    channel: 'SMS',
+    quote: "I don't think anyone really noticed I was there.",
+    summary: "Sarah's message matched your escalation topic 'Medical or grief / emotional concern'. The assistant paused and is waiting for a staff member.",
+    factChips: ['First visit', 'Interested in women\'s ministry', 'Requested prayer'],
+    whyText: "Sarah's message matched your escalation topic 'Medical or grief / emotional concern'. The assistant paused and is waiting for a staff member.",
+    visitDate: 'Sep 27',
+    serviceName: '11:00 AM service',
+  },
 ];
 
 export const todayTasks: TodayTask[] = [
-  { id: 't2', guestName: 'James Carter', guestInitials: 'JC', avatarColor: 'from-blue-400 to-blue-600', title: 'James Carter', detail: 'Asked about kids ministry — AI drafted a warm response', time: '14:15', priority: 'high', status: 'approval', channel: 'SMS', draftMessage: 'Hi James! Thanks for visiting Grace Community Church this morning. Yes, we have a kids program for ages 0-5 during both services. Your 4-year-old is welcome anytime! Feel free to ask me anything else. Reply STOP to opt out.' },
-  { id: 't3', guestName: 'Maria Torres', guestInitials: 'MT', avatarColor: 'from-amber-400 to-amber-600', title: 'Maria Torres', detail: 'No reply to first text in 3 days. Suggested: a personal call from a staff member.', time: '13:00', priority: 'high', status: 'follow-up', channel: 'SMS' },
-  { id: 't4', guestName: 'Michael Bennett', guestInitials: 'MB', avatarColor: 'from-stone-400 to-stone-600', title: 'Michael Bennett', detail: 'No response in 5 days. Attended 2nd service, sent 2 texts, no reply.', time: '12:00', priority: 'medium', status: 'risk', channel: 'SMS' },
-  { id: 't5', guestName: 'Rachel Green', guestInitials: 'RG', avatarColor: 'from-emerald-400 to-emerald-600', title: 'Rachel Green', detail: 'Confirmed she will be at the 11:00 service. Prep a welcome.', time: '11:30', priority: 'medium', status: 'returning', channel: 'SMS' },
-  { id: 't6', guestName: 'Connection Cards', guestInitials: 'CC', avatarColor: 'from-stone-400 to-stone-600', title: '2 connection cards from the 11:00 service are missing a phone number', detail: 'Add a phone number or switch these guests to email-first follow-up.', time: '09:00', priority: 'low', status: 'prep' },
-  { id: 't7', guestName: 'James Carter', guestInitials: 'JC', avatarColor: 'from-blue-400 to-blue-600', title: 'James Carter', detail: 'Welcomed and asked about prayer requests.', time: '08:15', priority: 'low', status: 'done', channel: 'SMS' },
+  {
+    id: 't2',
+    guestName: 'James Carter',
+    guestInitials: 'JC',
+    avatarColor: 'from-blue-400 to-blue-600',
+    title: 'James Carter',
+    detail: 'Asked about kids ministry — AI drafted a warm response',
+    time: '14:15',
+    priority: 'high',
+    status: 'approval',
+    channel: 'SMS',
+    draftMessage: 'Hi James! Thanks for visiting Grace Community Church this morning. Yes, we have a kids program for ages 0-5 during both services. Your 4-year-old is welcome anytime! Feel free to ask me anything else. Reply STOP to opt out.',
+    quote: 'Do you have a kids program for my 4-year-old?',
+    summary: 'James replied to the welcome text with a question about kids ministry. The assistant drafted a response for your review.',
+    factChips: ['First visit', '2 children', 'Interested in kids ministry'],
+    meta: 'Replied to welcome message · 2 children',
+  },
+  {
+    id: 't3',
+    guestName: 'Maria Torres',
+    guestInitials: 'MT',
+    avatarColor: 'from-amber-400 to-amber-600',
+    title: 'Maria Torres',
+    detail: 'No reply to first text in 3 days. Suggested: a personal call from a staff member.',
+    time: '13:00',
+    priority: 'high',
+    status: 'follow-up',
+    channel: 'SMS',
+    quote: 'Thanks! I got the welcome text.',
+    summary: 'Maria received the welcome text but has not replied to the follow-up in 3 days. A personal call is recommended.',
+    factChips: ['First visit', 'Sep 20'],
+    meta: 'No reply to follow-up · 3 days',
+  },
+  {
+    id: 't4',
+    guestName: 'Michael Bennett',
+    guestInitials: 'MB',
+    avatarColor: 'from-stone-400 to-stone-600',
+    title: 'Michael Bennett',
+    detail: 'No response in 5 days. Attended 2nd service, sent 2 texts, no reply.',
+    time: '12:00',
+    priority: 'medium',
+    status: 'risk',
+    channel: 'SMS',
+    quote: 'Maybe next week.',
+    summary: 'Michael has not responded to two texts in 5 days. He may need a phone call.',
+    factChips: ['First visit', 'Sep 22', '11:00 AM service'],
+    meta: 'No response in 5 days · 2 texts sent',
+  },
+  {
+    id: 't5',
+    guestName: 'Rachel Green',
+    guestInitials: 'RG',
+    avatarColor: 'from-emerald-400 to-emerald-600',
+    title: 'Rachel Green',
+    detail: 'Confirmed she will be at the 11:00 service. Prep a welcome.',
+    time: '11:30',
+    priority: 'medium',
+    status: 'returning',
+    channel: 'SMS',
+    quote: "Yes! I'll be there Sunday at 11.",
+    summary: 'Rachel confirmed she is coming back this Sunday for the 11:00 service. Prepare a warm welcome.',
+    factChips: ['Returning guest', '2nd visit', '11:00 AM service'],
+    meta: 'Confirmed for Sunday · 11:00 AM',
+  },
+  {
+    id: 't6',
+    guestName: 'Connection Cards',
+    guestInitials: 'CC',
+    avatarColor: 'from-stone-400 to-stone-600',
+    title: '2 connection cards from the 11:00 service are missing a phone number',
+    detail: 'Add a phone number or switch these guests to email-first follow-up.',
+    time: '09:00',
+    priority: 'low',
+    status: 'prep',
+    meta: '2 cards missing phone · 11:00 service',
+  },
+  {
+    id: 't7',
+    guestName: 'James Carter',
+    guestInitials: 'JC',
+    avatarColor: 'from-blue-400 to-blue-600',
+    title: 'James Carter',
+    detail: 'Welcomed and asked about prayer requests.',
+    time: '08:15',
+    priority: 'low',
+    status: 'done',
+    channel: 'SMS',
+  },
 ];
 
 export const todayLeaders: TodayLeader[] = [

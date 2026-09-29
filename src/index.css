@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: #FCFAF7;
+  --surface: #FFFFFF;
+  --text-primary: #10151A;
+  --text-secondary: #6B6F76;
+  --text-muted: #A3AAAC;
+  --border: #D8DDDC;
+  --button-primary: #262B30;
+  --brand-teal: #018477;
+  --brand-teal-text: #017A6E;
+  --danger: #C8102E;
+  --danger-tint: #FDF1F2;
+  --warning: #B45309;
+  --warning-tint: #FEF6E7;
+  --success: #047857;
+  --success-tint: #ECF8F3;
+  --info: #1D4ED8;
+  --info-tint: #EEF3FD;
+}
+
 @keyframes bounceIn {
   0%   { transform: scale(0.5); opacity: 0; }
   60%  { transform: scale(1.2); opacity: 1; }
@@ -13,3 +33,16 @@
   0%   { transform: translateY(16px) scale(0.97); opacity: 0; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
+
+@keyframes slideDownFade {
+  0%   { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes collapseOut {
+  0%   { transform: scale(1); opacity: 1; max-height: 500px; }
+  100% { transform: scale(0.95); opacity: 0; max-height: 0; margin: 0; padding: 0; }
+}
+
+.animate-slide-down { animation: slideDownFade 0.2s ease-out; }
+.animate-collapse-out { animation: collapseOut 0.3s ease-out forwards; }

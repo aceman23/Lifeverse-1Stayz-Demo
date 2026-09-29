@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight, HelpCircle, QrCode } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
 import { useOnboarding } from '../lib/onboarding-context';
-import { createDemoState } from '../data/onboarding';
+import { createDemoState, createInitialState } from '../data/onboarding';
 import { ChatWidget } from '../components/ui/ChatWidget';
 import { SpecMarker } from '../components/ui/SpecMarker';
 
@@ -28,15 +28,12 @@ export function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-
     if (error) {
       setError(error.message);
       setLoading(false);
       return;
     }
-
     navigate('/today');
   };
 
@@ -47,62 +44,89 @@ export function LoginPage() {
     navigate('/today');
   };
 
+  const handleStartOnboarding = () => {
+    update(createInitialState());
+    navigate('/onboarding');
+  };
+
   return (
-    <div className="min-h-screen bg-stone-50 flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-stone-50 via-amber-50 to-stone-100 relative overflow-hidden items-end p-16">
+    <div className="min-h-screen flex" style={{ background: 'var(--background)' }}>
+      {/* Desktop left panel */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-end p-16">
         <div className="absolute inset-0">
           <img
             src="https://images.pexels.com/photos/1666021/pexels-photo-1666021.jpeg?auto=compress&cs=tinysrgb&w=1200"
             alt=""
-            className="w-full h-full object-cover opacity-10"
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.35 }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(180deg, var(--background) 0%, transparent 40%, transparent 60%, var(--background) 100%)' }}
           />
         </div>
         <div className="relative z-10 w-full">
-          <h2 className="text-4xl font-light text-stone-800 leading-snug mb-4">
-            Save more souls.<br />
-            <span className="font-semibold text-[#2ec27e]">Retain more of your 1st time visitors.</span>
+          <h2
+            className="font-bold text-ink leading-tight mb-4"
+            style={{ fontSize: '44px', letterSpacing: '-0.02em' }}
+          >
+            Retain more of your<br />first-time visitors.
           </h2>
-          <p className="text-stone-500 text-base leading-relaxed max-w-sm">
-            Agentic AI digital assistants helps your church follow up with every guest through intelligent,
-            personalized engagement that feels genuinely human.
+          <p className="text-ink-2 text-lg leading-relaxed max-w-md">
+            1Stayz follows up with every guest through intelligent, personalized engagement that feels genuinely human.
           </p>
-          <div className="mt-10 flex justify-center">
-            <img src="/LifeversLogo.png" alt="Lifeverse" className="h-28 w-auto opacity-60" />
+          <div className="mt-12">
+            <img src="/LifeversLogo.png" alt="Lifeverse" className="h-10 w-auto opacity-50" />
           </div>
         </div>
       </div>
 
+      {/* Right / mobile column */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <div className="mb-10 lg:hidden">
-            <img src="/LifeverseHeaderMenuLogo.png" alt="Lifeverse" className="h-9 w-auto" />
+        <div className="w-full" style={{ maxWidth: '400px' }}>
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <img
+              src="/LVHI_1Stayz.png"
+              alt="1Stayz"
+              className="w-auto"
+              style={{ height: '64px', objectFit: 'contain' }}
+            />
           </div>
 
-          <div className="mb-8">
-            <div className="mb-4 flex justify-center">
-              <img src="/LVHI_1Stayz.png" alt="1Stayz" className="w-auto" style={{ height: '22.5rem', clipPath: 'inset(20% 0 15% 0)' }} />
-            </div>
-            <h1 className="text-2xl font-semibold text-stone-900 mb-1.5">Welcome back</h1>
-            <p className="text-sm text-stone-500">Sign in to your Agentic AI digital assistants account.</p>
-          </div>
+          <h1
+            className="font-bold text-ink text-center mb-2"
+            style={{ fontSize: '32px', letterSpacing: '-0.02em' }}
+          >
+            Welcome back
+          </h1>
+          <p className="text-ink-2 text-center text-base mb-8">
+            Sign in to your 1Stayz account.
+          </p>
 
           {savedMessage && (
-            <div className="flex items-start gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 mb-5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-emerald-700">{savedMessage}</p>
+            <div
+              className="flex items-start gap-2.5 rounded-12 p-3.5 mb-5"
+              style={{ background: 'var(--success-tint)', border: '1px solid var(--success)' }}
+            >
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--success)' }} />
+              <p className="text-sm" style={{ color: 'var(--success)' }}>{savedMessage}</p>
             </div>
           )}
 
           {error && (
-            <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 rounded-xl p-3.5 mb-5">
-              <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-rose-700">{error}</p>
+            <div
+              className="flex items-start gap-2.5 rounded-12 p-3.5 mb-5"
+              style={{ background: 'var(--danger-tint)', border: '1px solid var(--danger)' }}
+            >
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--danger)' }} />
+              <p className="text-sm" style={{ color: 'var(--danger)' }}>{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1.5" htmlFor="email">
+              <label className="block text-sm font-medium text-ink mb-1.5" htmlFor="email">
                 Email address
               </label>
               <input
@@ -113,18 +137,22 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@church.org"
-                className="w-full px-3.5 py-2.5 text-sm text-stone-900 bg-white border border-stone-200 rounded-xl placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-colors"
+                className="w-full px-4 rounded-12 text-sm text-ink bg-surface outline-none transition-colors"
+                style={{ height: '56px', border: '1px solid var(--border)' }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(1,132,119,.12)'; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-stone-700" htmlFor="password">
+                <label className="block text-sm font-medium text-ink" htmlFor="password">
                   Password
                 </label>
                 <button
                   type="button"
-                  className="text-xs text-amber-700 hover:text-amber-800 transition-colors"
+                  className="text-xs font-medium transition-colors"
+                  style={{ color: 'var(--brand-teal-text)' }}
                 >
                   Forgot password?
                 </button>
@@ -138,12 +166,16 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 pr-10 text-sm text-stone-900 bg-white border border-stone-200 rounded-xl placeholder-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-colors"
+                  className="w-full px-4 pr-12 rounded-12 text-sm text-ink bg-surface outline-none transition-colors"
+                  style={{ height: '56px', border: '1px solid var(--border)' }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--brand-teal)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(1,132,119,.12)'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-ink-3 hover:text-ink transition-colors"
+                  style={{ minHeight: '44px', minWidth: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -153,50 +185,72 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-stone-900 hover:bg-stone-800 disabled:bg-stone-300 text-white text-sm font-medium py-2.5 rounded-xl transition-colors mt-2"
+              className="w-full flex items-center justify-between rounded-12 text-white text-sm font-semibold transition-opacity disabled:opacity-50 px-5"
+              style={{ height: '56px', background: 'var(--button-primary)' }}
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              <span>{loading ? 'Signing in…' : 'Sign in'}</span>
+              <ArrowRight className="w-5 h-5" />
             </button>
           </form>
 
+          {/* or divider */}
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-stone-200" />
+              <div className="w-full border-t" style={{ borderColor: 'var(--border)' }} />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-stone-50 px-3 text-xs text-stone-400">or</span>
+              <span className="px-3 text-xs text-ink-3" style={{ background: 'var(--background)' }}>or</span>
             </div>
           </div>
 
-          <SpecMarker id="login.demo">
           <button
             type="button"
-            onClick={handleDemoLogin}
-            disabled={loading}
-            className="w-full bg-amber-50 hover:bg-amber-100 disabled:opacity-50 border border-amber-200 text-amber-800 text-sm font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+            onClick={handleStartOnboarding}
+            className="w-full flex items-center justify-between rounded-12 text-sm font-semibold transition-colors px-5 bg-surface"
+            style={{ height: '56px', border: '1.5px solid var(--brand-teal)', color: 'var(--brand-teal-text)' }}
           >
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            Try Demo Account
+            <span>Join the Pilot</span>
+            <ArrowRight className="w-5 h-5" />
           </button>
+
+          <SpecMarker id="login.demo">
+          <p className="text-sm text-ink-2 text-center mt-6">
+            Just want to look around?{' '}
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              className="font-semibold transition-colors"
+              style={{ color: 'var(--brand-teal-text)' }}
+            >
+              Try the demo →
+            </button>
+          </p>
           </SpecMarker>
 
-          <p className="text-sm text-stone-500 text-center mt-6">
-            Don&apos;t have an account?{' '}
-            <Link to="/sign-up" className="font-medium text-amber-700 hover:text-amber-800 transition-colors">
-              Create one
-            </Link>
-          </p>
+          {/* Need help divider */}
+          <div className="relative mt-8 mb-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t" style={{ borderColor: 'var(--border)' }} />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="px-3 text-xs text-ink-3" style={{ background: 'var(--background)' }}>Need help?</span>
+            </div>
+          </div>
 
-          <div className="flex items-center justify-center gap-4 mt-4">
-            <Link to="/onboarding" className="text-xs text-[#10B981] hover:text-[#0d9668] font-medium transition-colors">
-              Start onboarding
-            </Link>
-            <span className="text-stone-300">|</span>
-            <Link to="/beta" className="text-xs text-teal-700 hover:text-teal-800 font-medium transition-colors">
-              Join the Pilot
-            </Link>
-            <span className="text-stone-300">|</span>
-            <Link to="/beta/qr" className="text-xs text-teal-700 hover:text-teal-800 font-medium transition-colors">
+          <div className="flex items-center justify-center gap-6">
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent('open-chat-widget')); }}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-2 hover:text-ink transition-colors"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              Contact support
+            </a>
+            <Link
+              to="/beta/qr"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-2 hover:text-ink transition-colors"
+            >
+              <QrCode className="w-3.5 h-3.5" />
               Beta QR Code
             </Link>
           </div>
