@@ -1,22 +1,29 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bell, ChevronDown, LogOut, LayoutDashboard, Menu, Eye, Zap, AlertCircle } from 'lucide-react';
+import { Bell, ChevronDown, LogOut, Menu, Eye, Zap, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
 import { useOnboarding } from '../../lib/onboarding-context';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface HeaderProps {
-  pageTitle?: string;
-  pageSubtitle?: string;
   onMenuClick?: () => void;
 }
 
-export function Header({
-  pageTitle = 'DASHBOARD',
-  pageSubtitle = 'System overview of your visitor engagement',
-  onMenuClick,
-}: HeaderProps) {
+const ROUTE_META: Record<string, { title: string; subtitle: string }> = {
+  '/today': { title: 'TODAY', subtitle: "What needs your attention right now" },
+  '/': { title: 'DASHBOARD', subtitle: 'System overview of your visitor engagement' },
+  '/people': { title: 'PEOPLE', subtitle: 'Every guest and their journey' },
+  '/conversations': { title: 'CONVERSATIONS', subtitle: 'AI-powered chats across every channel' },
+  '/ai-training': { title: 'AI TRAINING', subtitle: 'Documents, guardrails, and tone' },
+  '/follow-up-engine': { title: 'FOLLOW-UP ENGINE', subtitle: 'Automated sequences that shepherd every visitor' },
+  '/appointments': { title: 'APPOINTMENTS', subtitle: 'Coffee chats and meeting invites' },
+  '/insights': { title: 'INSIGHTS', subtitle: 'Weekly metrics and pilot health' },
+  '/settings': { title: 'SETTINGS', subtitle: 'Configure your 1Stayz workspace' },
+};
+
+export function Header({ onMenuClick }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { state } = useOnboarding();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +36,11 @@ export function Header({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const routeKey = Object.keys(ROUTE_META).find((k) =>
+    k === '/' ? location.pathname === '/' : location.pathname.startsWith(k)
+  ) ?? '/';
+  const { title: pageTitle, subtitle: pageSubtitle } = ROUTE_META[routeKey];
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Pastor Ray';
   const initials = displayName
@@ -59,12 +71,7 @@ export function Header({
         </button>
 
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-          <div className="flex items-center gap-2 text-xs text-stone-400">
-            <span className="w-5 h-5 rounded-full bg-[#2ec27e] flex items-center justify-center shrink-0">
-              <LayoutDashboard className="w-3 h-3 text-white" strokeWidth={2} />
-            </span>
-            <span className="font-semibold text-stone-700 text-xs tracking-wide">{pageTitle}</span>
-          </div>
+          <span className="font-semibold text-stone-700 text-xs tracking-wide">{pageTitle}</span>
           <span className="hidden sm:block text-stone-300 text-xs">|</span>
           <p className="hidden sm:block text-xs text-stone-400 truncate">{pageSubtitle}</p>
 

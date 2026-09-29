@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useOnboarding } from '../../lib/onboarding-context';
-import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, Sliders, Check, Lock, CheckCircle2, Sparkles } from 'lucide-react';
+import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, Sliders, Check, Lock, CheckCircle2, Sparkles, Send } from 'lucide-react';
 import type { DoctrinalPosition } from '../../data/onboarding';
 import { LOCKED_RULES } from '../../data/onboarding';
 
@@ -57,7 +57,19 @@ export function Step5Guardrails() {
     });
   }
 
+  function sendForApproval() {
+    update({ guardrailsApprovedBy: null, guardrailsApprovedAt: null });
+  }
+
+  function simulateApproval() {
+    update({
+      guardrailsApprovedBy: state.church.yourName || 'Pastor',
+      guardrailsApprovedAt: new Date().toISOString(),
+    });
+  }
+
   const guardrailsApproved = !!state.guardrailsApprovedBy;
+  const isSeniorPastor = state.church.yourRole === 'Senior Pastor';
 
   return (
     <div className="space-y-6">
@@ -277,13 +289,39 @@ export function Step5Guardrails() {
             </div>
           </div>
         ) : (
-          <button
-            onClick={approveGuardrails}
-            className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl bg-[#1a2e2a] text-white hover:bg-[#245045] transition-colors"
-          >
-            <Check className="w-4 h-4" />
-            Approve guardrails as pastor
-          </button>
+          <div className="space-y-3">
+            <div className="flex items-start gap-2.5 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-700 leading-relaxed">
+                Guardrails need to be approved by a pastor before you can go live.
+              </p>
+            </div>
+            {isSeniorPastor ? (
+              <button
+                onClick={approveGuardrails}
+                className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl bg-[#1a2e2a] text-white hover:bg-[#245045] transition-colors"
+              >
+                <Check className="w-4 h-4" />
+                Approve guardrails as pastor
+              </button>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  onClick={sendForApproval}
+                  className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl bg-[#1a2e2a] text-white hover:bg-[#245045] transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                  Send to pastor for approval
+                </button>
+                <button
+                  onClick={simulateApproval}
+                  className="block text-xs font-medium text-[#10B981] hover:text-[#0d9668] underline"
+                >
+                  Simulate pastor approval
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

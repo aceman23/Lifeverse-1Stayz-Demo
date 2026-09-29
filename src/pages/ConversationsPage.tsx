@@ -22,6 +22,7 @@ import { useChatSessions, useChatMessages } from '../lib/hooks';
 import { supabase } from '../lib/supabase';
 import { timeAgo } from '../lib/utils';
 import type { ChatSession, ChatMessage, ChatSessionStatus, ChatChannel } from '../lib/types';
+import { SpecMarker } from '../components/ui/SpecMarker';
 
 const CHANNEL_ICONS: Record<ChatChannel, typeof Globe> = {
   web_chat: Globe,
@@ -97,18 +98,21 @@ export function ConversationsPage() {
         </div>
 
         {/* Stats bar */}
+        <SpecMarker id="conversations.list">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           <StatChip label="Active" value={activeCount} dot="bg-emerald-500" />
           <StatChip label="Paused" value={pausedCount} dot="bg-amber-500" />
           <StatChip label="Taken Over" value={takenOverCount} dot="bg-blue-500" />
           <StatChip label="Escalated" value={escalatedCount} dot="bg-rose-500" />
         </div>
+        </SpecMarker>
       </div>
 
       {/* Inbox layout */}
       <div className="mx-6 bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden flex" style={{ height: 'calc(100vh - 280px)', minHeight: '500px' }}>
         {/* Left: Session list */}
         <div className={`w-full md:w-[340px] shrink-0 border-r border-stone-100 flex flex-col ${selected ? 'hidden md:flex' : 'flex'}`}>
+          <SpecMarker id="conversations.list.search">
           {/* Search + filters */}
           <div className="p-3 border-b border-stone-50 space-y-3">
             <div className="relative">
@@ -137,6 +141,7 @@ export function ConversationsPage() {
               ))}
             </div>
           </div>
+          </SpecMarker>
 
           {/* Session list */}
           <div className="flex-1 overflow-y-auto">

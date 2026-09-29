@@ -3,6 +3,8 @@ import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth';
+import { useOnboarding } from '../lib/onboarding-context';
+import { createDemoState } from '../data/onboarding';
 import { ChatWidget } from '../components/ui/ChatWidget';
 import { SpecMarker } from '../components/ui/SpecMarker';
 
@@ -10,6 +12,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { session, loading: authLoading, demoMode, enterDemoMode } = useAuth();
+  const { update } = useOnboarding();
   const savedMessage = (location.state as { savedMessage?: string } | null)?.savedMessage;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,8 +41,10 @@ export function LoginPage() {
   };
 
   const handleDemoLogin = () => {
+    const demoState = createDemoState();
+    update(demoState);
     enterDemoMode();
-    navigate('/onboarding');
+    navigate('/today');
   };
 
   return (

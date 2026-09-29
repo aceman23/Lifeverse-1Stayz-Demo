@@ -3,7 +3,7 @@ import { SpecMarker } from '../components/ui/SpecMarker';
 
 export function FollowUpEnginePage() {
   return (
-    <SpecMarker id="followup_engine">
+    <SpecMarker id="follow_up_engine">
     <div className="min-h-screen bg-[#f5f6f8] px-6 pt-20 pb-10">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-stone-900">Follow-Up Engine</h1>

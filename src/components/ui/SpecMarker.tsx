@@ -1,7 +1,7 @@
 import { useSpecMode } from '../../lib/spec-mode-context';
 import { SPEC_DATA, type SpecEntry } from '../../data/spec';
-import { X, Copy, Check } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { X, Copy, Check, List } from 'lucide-react';
+import { useState, useEffect, type ReactNode } from 'react';
 
 interface SpecMarkerProps {
   id: string;
@@ -9,7 +9,13 @@ interface SpecMarkerProps {
 }
 
 export function SpecMarker({ id, children }: SpecMarkerProps) {
-  const { specMode, setActiveSpecId } = useSpecMode();
+  const { specMode, setActiveSpecId, registerId, unregisterId } = useSpecMode();
+
+  useEffect(() => {
+    registerId(id);
+    return () => unregisterId(id);
+  }, [id, registerId, unregisterId]);
+
   if (!specMode) return <>{children}</>;
 
   const entry = SPEC_DATA[id];
@@ -26,7 +32,7 @@ export function SpecMarker({ id, children }: SpecMarkerProps) {
           {entry.cards[0] ?? '?'}
         </button>
       </div>
-      <div className="rounded-xl ring-1 ring-[#6366F1]/40 ring-dashed">
+      <div className="rounded-xl outline-dashed outline-1 outline-[#6366F1]/50 outline-offset-2">
         {children}
       </div>
     </div>
@@ -52,7 +58,7 @@ export function SpecModeToggle() {
 }
 
 export function SpecPanel() {
-  const { specMode, activeSpecId, setActiveSpecId } = useSpecMode();
+  const { specMode, activeSpecId, setActiveSpecId, registeredIds } = useSpecMode();
   const [copied, setCopied] = useState(false);
   if (!specMode || !activeSpecId) return null;
 
@@ -140,6 +146,34 @@ export function SpecPanel() {
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? 'Copied!' : 'Copy as Markdown'}
           </button>
+
+          {registeredIds.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
+                <List className="w-3 h-3" />
+                Spec: this screen
+              </p>
+              <div className="space-y-1">
+                {registeredIds.map((rid) => {
+                  const rEntry = SPEC_DATA[rid];
+                  return (
+                    <button
+                      key={rid}
+                      onClick={() => setActiveSpecId(rid)}
+                      className={`w-full text-left text-xs px-2.5 py-2 rounded-lg transition-colors ${
+                        rid === activeSpecId
+                          ? 'bg-[#6366F1]/10 text-[#6366F1] font-medium'
+                          : 'text-stone-600 hover:bg-stone-50'
+                      }`}
+                    >
+                      {rEntry?.cards[0] ? <span className="font-mono text-[10px] text-stone-400 mr-1.5">{rEntry.cards[0]}</span> : null}
+                      {rEntry?.title ?? rid}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

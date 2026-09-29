@@ -27,7 +27,11 @@ export function OnboardingPage() {
 
   function handleSaveExit() {
     saveAndExit();
-    navigate('/today');
+    if (isSignedIn) {
+      navigate('/today');
+    } else {
+      navigate('/login', { state: { savedMessage: 'Your setup is saved on this device.' } });
+    }
   }
 
   function canGoToStep(target: number): boolean {

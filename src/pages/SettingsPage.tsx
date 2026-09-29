@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Download, Loader2, RefreshCw, Building2, Calendar, Shield, Users, MessageSquare, Plug, ToggleRight } from 'lucide-react';
 import type { BetaSignup } from '../lib/types';
+import type { OnboardingState } from '../data/onboarding';
 import { Step1Church } from '../components/onboarding/Step1Church';
 import { Step2Reading } from '../components/onboarding/Step2Reading';
 import { Step5Guardrails } from '../components/onboarding/Step5Guardrails';
@@ -107,36 +108,7 @@ export function SettingsPage() {
         {activeTab === 'message' && <Step7Message />}
         {activeTab === 'integrations' && <Step4Systems />}
         {activeTab === 'mode' && (
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-xl font-semibold text-stone-900">Mode</h2>
-              <p className="text-sm text-stone-500 mt-1">Switch between Shadow and Live mode.</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => update({ mode: 'shadow' })}
-                className={`text-left p-5 rounded-2xl border transition-all ${
-                  state.mode === 'shadow'
-                    ? 'bg-amber-50 border-amber-200'
-                    : 'bg-white border-stone-100 hover:border-stone-200'
-                }`}
-              >
-                <p className="text-sm font-semibold text-stone-900 mb-1">Shadow Mode</p>
-                <p className="text-xs text-stone-400">1Stayz writes every message but holds it for your approval.</p>
-              </button>
-              <button
-                onClick={() => update({ mode: 'live' })}
-                className={`text-left p-5 rounded-2xl border transition-all ${
-                  state.mode === 'live'
-                    ? 'bg-emerald-50 border-emerald-200'
-                    : 'bg-white border-stone-100 hover:border-stone-200'
-                }`}
-              >
-                <p className="text-sm font-semibold text-stone-900 mb-1">Live Mode</p>
-                <p className="text-xs text-stone-400">1Stayz sends messages automatically.</p>
-              </button>
-            </div>
-          </div>
+          <ModeTab state={state} update={update} />
         )}
       </div>
       </SpecMarker>
@@ -206,6 +178,90 @@ export function SettingsPage() {
             </table>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ModeTab({ state, update }: { state: OnboardingState; update: (patch: Partial<OnboardingState>) => void }) {
+  const checks = [
+    { key: 'church', label: 'Church profile reviewed', ok: state.church.name.trim() !== '' && state.church.yourName.trim() !== '' && state.church.yourRole !== '' },
+    { key: 'schedule', label: 'Service schedule set', ok: state.serviceSchedule.length > 0 && state.serviceSchedule.every((s) => s.name.trim() !== '' && s.startTime < s.endTime) },
+    { key: 'subsplash', label: 'Subsplash connected', ok: state.integrations.subsplash !== 'none' },
+    { key: 'guardrails', label: 'Guardrails approved by pastor', ok: !!state.guardrailsApprovedBy },
+    { key: 'team', label: 'Team & escalation contacts set', ok: state.staff.length > 0 && state.staff.some((s) => s.receivesEscalations) },
+    { key: 'message', label: 'First message approved by pastor', ok: state.firstMessageStatus === 'approved' },
+    { key: 'consent', label: 'Consent wording live on connection card', ok: state.integrations.consentWordingLive },
+    { key: 'sms', label: 'Text number approved OR email-first fallback acknowledged', ok: state.integrations.smsStatus === 'approved' || state.integrations.emailFallbackAcknowledged },
+    { key: 'shadow', label: 'Shadow Sunday completed', ok: state.integrations.shadowSundayCompleted },
+  ];
+
+  const allGreen = checks.every((c) => c.ok);
+  const missing = checks.filter((c) => !c.ok);
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xl font-semibold text-stone-900">Mode</h2>
+        <p className="text-sm text-stone-500 mt-1">Switch between Shadow and Live mode.</p>
+      </div>
+
+      {!allGreen && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+          <p className="text-sm font-medium text-amber-800 mb-2">Live mode is not ready yet</p>
+          <p className="text-xs text-amber-700 mb-3">Complete these items before going live:</p>
+          <ul className="space-y-1.5">
+            {missing.map((c) => (
+              <li key={c.key} className="text-xs text-amber-700 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                {c.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Shadow Sunday toggle */}
+      <div className="bg-white rounded-2xl border border-stone-100 p-4 flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-stone-800">Shadow Sunday completed</p>
+          <p className="text-xs text-stone-400 mt-0.5">Mark this after running a full Sunday in shadow mode.</p>
+        </div>
+        <button
+          onClick={() => update({ integrations: { ...state.integrations, shadowSundayCompleted: !state.integrations.shadowSundayCompleted } })}
+          className={`relative w-11 h-6 rounded-full transition-colors ${state.integrations.shadowSundayCompleted ? 'bg-emerald-500' : 'bg-stone-200'}`}
+        >
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${state.integrations.shadowSundayCompleted ? 'translate-x-5' : ''}`} />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <button
+          onClick={() => update({ mode: 'shadow' })}
+          className={`text-left p-5 rounded-2xl border transition-all ${
+            state.mode === 'shadow'
+              ? 'bg-amber-50 border-amber-200'
+              : 'bg-white border-stone-100 hover:border-stone-200'
+          }`}
+        >
+          <p className="text-sm font-semibold text-stone-900 mb-1">Shadow Mode</p>
+          <p className="text-xs text-stone-400">1Stayz writes every message but holds it for your approval.</p>
+        </button>
+        <button
+          onClick={() => allGreen && update({ mode: 'live' })}
+          disabled={!allGreen}
+          className={`text-left p-5 rounded-2xl border transition-all ${
+            state.mode === 'live'
+              ? 'bg-emerald-50 border-emerald-200'
+              : allGreen
+                ? 'bg-white border-stone-100 hover:border-stone-200'
+                : 'bg-stone-50 border-stone-100 opacity-60 cursor-not-allowed'
+          }`}
+        >
+          <p className="text-sm font-semibold text-stone-900 mb-1">Live Mode</p>
+          <p className="text-xs text-stone-400">1Stayz sends messages automatically.</p>
+          {!allGreen && <p className="text-[10px] text-amber-600 mt-2">Complete all checks to enable</p>}
+        </button>
       </div>
     </div>
   );

@@ -12,9 +12,11 @@ import {
   X,
   Sun,
 } from 'lucide-react';
+import { useOnboarding } from '../../lib/onboarding-context';
+import { escalations, todayTasks } from '../../data/today';
 
 const navItems = [
-  { to: '/today', icon: Sun, label: 'Today', badge: 5, badgeColor: 'bg-rose-500' },
+  { to: '/today', icon: Sun, label: 'Today' },
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/people', icon: Users, label: 'People' },
   { to: '/conversations', icon: MessageSquare, label: 'Conversations' },
@@ -31,6 +33,10 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
+  const { state } = useOnboarding();
+
+  const todayBadge = escalations.length + (state.mode === 'shadow' ? todayTasks.filter((t) => t.status === 'approval').length : 0);
+
   useEffect(() => {
     if (mobileOpen) onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +64,10 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 overflow-y-auto">
         <ul className="space-y-0.5">
-          {navItems.map(({ to, icon: Icon, label, badge, badgeColor, soon }) => (
+          {navItems.map(({ to, icon: Icon, label, soon }) => {
+            const badge = to === '/today' ? todayBadge : undefined;
+            const badgeColor = 'bg-rose-500';
+            return (
             <li key={to}>
               <NavLink
                 to={to}
@@ -74,7 +83,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               >
                 <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} />
                 {label}
-                {badge !== undefined && (
+                {badge !== undefined && badge > 0 && (
                   <span className={`ml-auto text-[10px] font-bold text-white ${badgeColor} px-1.5 py-0.5 rounded-full min-w-[18px] text-center`}>
                     {badge}
                   </span>
@@ -86,7 +95,8 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                 )}
               </NavLink>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </nav>
 

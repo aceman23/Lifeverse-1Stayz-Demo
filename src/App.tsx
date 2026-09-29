@@ -48,7 +48,6 @@ function AppShell() {
           </Routes>
         </main>
       </div>
-      <SpecPanel />
     </div>
   );
 }
@@ -75,6 +74,7 @@ export default function App() {
               />
             </Routes>
             <SpecModeToggle />
+            <SpecPanel />
           </BrowserRouter>
         </SpecModeProvider>
       </OnboardingProvider>
