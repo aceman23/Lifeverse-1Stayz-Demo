@@ -61,12 +61,13 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   return (
     <header
-      className="hidden md:flex fixed top-0 left-56 right-0 z-40 items-center px-6 gap-3"
+      className="flex fixed top-0 left-0 right-0 md:left-56 z-40 items-center px-4 md:px-6 gap-2 md:gap-3"
       style={{ height: '56px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}
     >
       <button
         onClick={onMenuClick}
         className="md:hidden p-2 -ml-1 text-ink-2 hover:text-ink transition-colors rounded-lg"
+        style={{ minHeight: '44px', minWidth: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         aria-label="Open menu"
       >
         <Menu className="w-5 h-5" />
