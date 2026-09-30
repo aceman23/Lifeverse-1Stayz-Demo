@@ -90,7 +90,7 @@ export function LoginPage() {
               src="/LVHI_1Stayz.png"
               alt="1Stayz"
               className="w-auto"
-              style={{ height: '96px', objectFit: 'contain' }}
+              style={{ height: '192px', objectFit: 'contain' }}
             />
           </div>
 
