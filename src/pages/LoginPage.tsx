@@ -85,12 +85,12 @@ export function LoginPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="w-full" style={{ maxWidth: '400px' }}>
           {/* Logo */}
-          <div className="flex justify-center mb-8 h-14 overflow-hidden" aria-label="1Stayz">
+          <div className="flex justify-center mb-8">
             <img
               src="/LVHI_1Stayz.png"
               alt="1Stayz"
-              className="w-auto max-w-none self-start"
-              style={{ height: '150px', objectFit: 'contain' }}
+              className="w-auto"
+              style={{ height: '96px', objectFit: 'contain' }}
             />
           </div>
 
