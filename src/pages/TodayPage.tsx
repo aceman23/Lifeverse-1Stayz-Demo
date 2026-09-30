@@ -196,7 +196,7 @@ export function TodayPage() {
         </div>
       </div>
 
-      <div className="px-4 md:px-6 lg:px-8 pt-6 lg:pt-8">
+      <div className="px-4 md:px-6 lg:px-8 pt-6 lg:pt-[80px]">
         <div className="max-w-[1100px] mx-auto">
           {/* Greeting */}
           <SpecMarker id="today.header">

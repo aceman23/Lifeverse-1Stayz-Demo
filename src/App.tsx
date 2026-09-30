@@ -27,7 +27,7 @@ function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f5f6f8]">
+    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
       <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="md:pl-56">
         <Header onMenuClick={() => setSidebarOpen(true)} />
