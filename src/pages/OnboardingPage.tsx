@@ -34,10 +34,8 @@ export function OnboardingPage() {
     }
   }
 
-  function canGoToStep(target: number): boolean {
-    for (let i = 0; i < target; i++) {
-      if (!checkCanContinue(i, state)) return false;
-    }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function canGoToStep(_target: number): boolean {
     return true;
   }
 
@@ -122,7 +120,7 @@ export function OnboardingPage() {
                 </button>
                 <button
                   onClick={nextStep}
-                  disabled={!canContinue}
+                  disabled={false}
                   className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl bg-[#1a2e2a] text-white hover:bg-[#245045] disabled:bg-stone-200 disabled:text-stone-400 disabled:cursor-not-allowed transition-colors"
                 >
                   Continue
