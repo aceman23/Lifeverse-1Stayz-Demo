@@ -64,7 +64,7 @@ export interface OnboardingState {
 
   integrations: {
     subsplash: 'none' | 'webhook' | 'zapier' | 'qrcard';
-    email: 'none' | 'gmail' | 'outlook' | '1stayz';
+    email: 'none' | 'gmail' | 'outlook' | 'yahoo' | 'proton' | 'icloud' | 'zoho' | '1stayz' | 'other';
     smsStatus: SmsStatus;
   emailFallbackAcknowledged: boolean;
   shadowSundayCompleted: boolean;

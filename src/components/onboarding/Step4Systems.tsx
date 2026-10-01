@@ -74,7 +74,12 @@ export function Step4Systems() {
     { value: 'none', label: 'Not connected' },
     { value: 'gmail', label: 'Gmail' },
     { value: 'outlook', label: 'Outlook' },
+    { value: 'yahoo', label: 'Yahoo' },
+    { value: 'proton', label: 'Proton Mail' },
+    { value: 'icloud', label: 'iCloud Mail' },
+    { value: 'zoho', label: 'Zoho Mail' },
     { value: '1stayz', label: '1Stayz email' },
+    { value: 'other', label: 'Other' },
   ] as const;
 
   const disabledIntegrations = [
@@ -258,7 +263,7 @@ export function Step4Systems() {
           <Mail className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Email Provider</h3>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
           {emailOptions.map((opt) => {
             const selected = state.integrations.email === opt.value;
             return (
