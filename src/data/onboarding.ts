@@ -140,11 +140,6 @@ export const DEFAULT_GUEST_FIELDS = [
   'last_name',
   'phone',
   'email',
-  'household_size',
-  'kids_ages',
-  'how_they_heard',
-  'prayer_request',
-  'which_service',
 ];
 
 export const DEFAULT_DOCTRINAL_TOPICS = [

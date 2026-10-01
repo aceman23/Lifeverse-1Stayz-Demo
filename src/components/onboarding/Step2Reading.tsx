@@ -311,35 +311,42 @@ export function Step2Reading() {
         <p className="text-xs text-stone-400 mb-4">Which fields should your assistant ask guests about?</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {[
-            { key: 'first_name', label: 'First name' },
-            { key: 'last_name', label: 'Last name' },
-            { key: 'phone', label: 'Phone' },
-            { key: 'email', label: 'Email' },
-            { key: 'household_size', label: 'Household size' },
-            { key: 'kids_ages', label: "Kids' ages" },
-            { key: 'how_they_heard', label: 'How they heard' },
-            { key: 'prayer_request', label: 'Prayer request' },
-            { key: 'which_service', label: 'Which service' },
+            { key: 'first_name', label: 'First name', required: true },
+            { key: 'last_name', label: 'Last name', required: true },
+            { key: 'phone', label: 'Phone', required: true },
+            { key: 'email', label: 'Email', required: true },
+            { key: 'household_size', label: 'Household size', required: false },
+            { key: 'kids_ages', label: "Kids' ages", required: false },
+            { key: 'how_they_heard', label: 'How they heard', required: false },
+            { key: 'prayer_request', label: 'Prayer request', required: false },
+            { key: 'which_service', label: 'Which service', required: false },
           ].map((f) => {
-            const selected = state.guestFields.includes(f.key);
+            const selected = f.required || state.guestFields.includes(f.key);
             return (
               <button
                 key={f.key}
+                disabled={f.required}
                 onClick={() => {
-                  if (selected) {
+                  if (f.required) return;
+                  if (state.guestFields.includes(f.key)) {
                     update({ guestFields: state.guestFields.filter((x) => x !== f.key) });
                   } else {
                     update({ guestFields: [...state.guestFields, f.key] });
                   }
                 }}
                 className={`text-xs font-medium px-3 py-2.5 rounded-lg border transition-all text-left ${
-                  selected
-                    ? 'bg-[#10B981]/10 text-[#0d9668] border-[#10B981]/30'
-                    : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
+                  f.required
+                    ? 'bg-[#10B981]/10 text-[#0d9668] border-[#10B981]/30 cursor-default'
+                    : selected
+                      ? 'bg-[#10B981]/10 text-[#0d9668] border-[#10B981]/30 hover:bg-[#10B981]/15'
+                      : 'bg-white text-stone-500 border-stone-200 hover:border-stone-300'
                 }`}
               >
-                {selected && <Check className="w-3 h-3 inline mr-1" />}
+                <Check className="w-3 h-3 inline mr-1" style={{ opacity: selected ? 1 : 0 }} />
                 {f.label}
+                {f.required && (
+                  <span className="ml-1.5 text-[9px] font-semibold uppercase tracking-wide text-[#0d9668]/60">required</span>
+                )}
               </button>
             );
           })}
