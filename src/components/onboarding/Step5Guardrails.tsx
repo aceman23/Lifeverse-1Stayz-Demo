@@ -164,7 +164,7 @@ export function Step5Guardrails() {
                           : 'text-stone-400 hover:bg-stone-50'
                       }`}
                     >
-                      {stance === 'explain' && 'Explain'}
+                      {stance === 'explain' && 'AI Explain'}
                       {stance === 'route' && 'Route to pastor'}
                       {stance === 'skip' && "Don't discuss"}
                     </button>
