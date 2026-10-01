@@ -54,8 +54,8 @@ export function Step4Systems() {
           </span>
         </div>
         <p className="text-xs text-stone-400 mb-4">Choose how 1Stayz connects to Subsplash.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {subsplashOptions.map((opt) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          {subsplashOptions.filter((o) => o.value !== 'qrcard').map((opt) => {
             const selected = state.integrations.subsplash === opt.value;
             return (
               <button
@@ -87,6 +87,38 @@ export function Step4Systems() {
           </p>
         )}
       </div>
+
+      {/* 1Stayz Connection Card & QR */}
+      {(() => {
+        const opt = subsplashOptions.find((o) => o.value === 'qrcard')!;
+        const selected = state.integrations.subsplash === 'qrcard';
+        return (
+          <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Smartphone className="w-4 h-4 text-stone-400" />
+              <h3 className="text-sm font-semibold text-stone-800">1Stayz Connection Card &amp; QR</h3>
+            </div>
+            <p className="text-xs text-stone-400 mb-4">Posts to Subsplash and 1Stayz — use when direct integration isn't available.</p>
+            <button
+              onClick={() => update({ integrations: { ...state.integrations, subsplash: opt.value } })}
+              className={`w-full p-4 rounded-xl border transition-all text-left ${
+                selected
+                  ? 'bg-[#10B981]/5 border-[#10B981]/30'
+                  : 'bg-white border-stone-200 hover:border-stone-300'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-stone-700">{opt.label}</span>
+                {selected && (
+                  <div className="w-4 h-4 rounded-full bg-[#10B981] flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Email */}
       <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
