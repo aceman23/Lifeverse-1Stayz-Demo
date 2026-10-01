@@ -280,10 +280,11 @@ export function Step4Systems() {
 
       {/* SMS status */}
       <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-1">
           <Phone className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Text Number</h3>
         </div>
+        <p className="text-xs text-stone-400 mb-3">We will get a number for texting that is local based on your address.</p>
         <div className={`flex items-center gap-3 p-4 rounded-xl border ${smsColors[state.integrations.smsStatus]}`}>
           <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center shrink-0">
             <Clock className="w-4 h-4 text-stone-600" />
