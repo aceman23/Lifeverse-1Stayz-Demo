@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { useOnboarding } from '../../lib/onboarding-context';
 import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, Sliders, Check, Lock, CheckCircle2, Sparkles, Send } from 'lucide-react';
 import type { DoctrinalPosition } from '../../data/onboarding';
-import { LOCKED_RULES } from '../../data/onboarding';
 
 export function Step5Guardrails() {
   const { state, update } = useOnboarding();
@@ -187,23 +186,6 @@ export function Step5Guardrails() {
                 </p>
               )}
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Locked rules */}
-      <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Lock className="w-4 h-4 text-stone-400" />
-          <h3 className="text-sm font-semibold text-stone-800">Locked Rules</h3>
-        </div>
-        <p className="text-xs text-stone-400 mb-4">These rules are always on and can't be changed.</p>
-        <div className="flex flex-wrap gap-2">
-          {LOCKED_RULES.map((rule) => (
-            <span key={rule} className="text-xs font-medium px-3.5 py-2 rounded-full bg-stone-100 text-stone-500 border border-stone-200 inline-flex items-center gap-1.5">
-              <Lock className="w-3 h-3 text-stone-400" />
-              {rule}
-            </span>
           ))}
         </div>
       </div>

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Download, Loader2, RefreshCw, Building2, Calendar, Shield, Users, MessageSquare, Plug, ToggleRight } from 'lucide-react';
+import { Download, Loader2, RefreshCw, Building2, Calendar, Shield, Users, MessageSquare, Plug, ToggleRight, Lock, Plus, X } from 'lucide-react';
 import type { BetaSignup } from '../lib/types';
 import type { OnboardingState } from '../data/onboarding';
+import { LOCKED_RULES } from '../data/onboarding';
 import { Step1Church } from '../components/onboarding/Step1Church';
 import { Step2Reading } from '../components/onboarding/Step2Reading';
 import { Step5Guardrails } from '../components/onboarding/Step5Guardrails';
@@ -103,7 +104,12 @@ export function SettingsPage() {
       <div className="max-w-[720px]">
         {activeTab === 'church' && <Step1Church />}
         {activeTab === 'schedule' && <Step2Reading />}
-        {activeTab === 'guardrails' && <Step5Guardrails />}
+        {activeTab === 'guardrails' && (
+          <div className="space-y-6">
+            <Step5Guardrails />
+            <LockedRulesCard />
+          </div>
+        )}
         {activeTab === 'team' && <Step6Team />}
         {activeTab === 'message' && <Step7Message />}
         {activeTab === 'integrations' && <Step4Systems />}
@@ -178,6 +184,71 @@ export function SettingsPage() {
             </table>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function LockedRulesCard() {
+  const [rules, setRules] = useState<string[]>([...LOCKED_RULES]);
+  const [newRule, setNewRule] = useState('');
+
+  function addRule() {
+    const trimmed = newRule.trim();
+    if (!trimmed || rules.includes(trimmed)) return;
+    setRules((prev) => [...prev, trimmed]);
+    setNewRule('');
+  }
+
+  function removeRule(rule: string) {
+    setRules((prev) => prev.filter((r) => r !== rule));
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-stone-100 p-6 shadow-sm">
+      <div className="flex items-center gap-2 mb-1">
+        <Lock className="w-4 h-4 text-stone-400" />
+        <h3 className="text-sm font-semibold text-stone-800">Locked Rules</h3>
+      </div>
+      <p className="text-xs text-stone-400 mb-4">These rules are always enforced by the assistant. Add or remove rules here.</p>
+      <div className="flex flex-wrap gap-2 mb-4">
+        {rules.map((rule) => (
+          <span
+            key={rule}
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-stone-100 text-stone-600 border border-stone-200 group"
+          >
+            <Lock className="w-3 h-3 text-stone-400 shrink-0" />
+            {rule}
+            <button
+              onClick={() => removeRule(rule)}
+              className="ml-0.5 text-stone-300 hover:text-rose-500 transition-colors"
+              aria-label={`Remove rule: ${rule}`}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </span>
+        ))}
+        {rules.length === 0 && (
+          <p className="text-xs text-stone-400 italic">No locked rules — add one below.</p>
+        )}
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newRule}
+          onChange={(e) => setNewRule(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && addRule()}
+          placeholder="Add a new rule…"
+          className="flex-1 text-sm border border-stone-200 rounded-lg px-3.5 py-2 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+        />
+        <button
+          onClick={addRule}
+          disabled={!newRule.trim()}
+          className="inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg bg-[#1a2e2a] text-white hover:bg-[#245045] disabled:bg-stone-200 disabled:text-stone-400 disabled:cursor-not-allowed transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add
+        </button>
       </div>
     </div>
   );
