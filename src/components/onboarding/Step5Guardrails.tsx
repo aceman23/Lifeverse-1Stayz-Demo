@@ -140,8 +140,11 @@ export function Step5Guardrails() {
           <Shield className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Doctrinal Positions</h3>
         </div>
-        <p className="text-xs text-stone-400 mb-4">
+        <p className="text-xs text-stone-400 mb-2">
           For each topic, choose whether your assistant should explain your church's view, route to a pastor, or not discuss it.
+        </p>
+        <p className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-4">
+          Do not click unless you want the rules to be interchangeable.
         </p>
         <div className="space-y-3">
           {state.doctrinalPositions.map((pos) => (
