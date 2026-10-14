@@ -199,7 +199,7 @@ export function Step5Guardrails() {
           <AlertTriangle className="w-4 h-4 text-stone-400" />
           <h3 className="text-sm font-semibold text-stone-800">Escalation Topics</h3>
         </div>
-        <p className="text-xs text-stone-400 mb-4">When these come up, the assistant immediately routes to a pastor.</p>
+        <p className="text-xs text-stone-400 mb-4">Choose which topics get routed to a pastor immediately.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {state.escalationTopics.map((topic) => (
             <button

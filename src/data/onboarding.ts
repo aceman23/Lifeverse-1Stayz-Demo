@@ -268,7 +268,7 @@ export function createInitialState(): OnboardingState {
     escalationTopics: DEFAULT_ESCALATION_TOPICS.map((label, i) => ({
       id: `esc-${i}`,
       label,
-      enabled: true,
+      enabled: false,
     })),
     tone: ['Warm'],
     signOff: 'The team at Grace Community Church',
