@@ -228,17 +228,38 @@ export function Step6Team() {
           {state.staffAlertsEnabled && (
             <>
               <div>
-                <label className="text-xs font-medium text-stone-600 mb-1.5 block flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-stone-400" />
-                  Alert phone number
-                </label>
-                <input
-                  type="tel"
-                  value={state.staffAlertsPhone}
-                  onChange={(e) => update({ staffAlertsPhone: e.target.value })}
-                  placeholder="(555) 123-4567"
-                  className="w-full text-sm border border-stone-200 rounded-lg px-3.5 py-2.5 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
-                />
+                <p className="text-xs font-medium text-stone-600 mb-2">Select staff who should receive SMS alerts</p>
+                <div className="space-y-2">
+                  {state.staff.map((staff) => (
+                    <div key={staff.id} className="border border-stone-200 rounded-xl p-3">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={staff.receivesEscalations}
+                          onChange={(e) => updateStaff(staff.id, { receivesEscalations: e.target.checked })}
+                          className="w-4 h-4 rounded accent-[#10B981]"
+                        />
+                        <span className="text-sm font-medium text-stone-700 flex-1">{staff.name || 'Unnamed staff member'}</span>
+                        <span className="text-xs text-stone-400">{staff.role}</span>
+                      </label>
+                      {staff.receivesEscalations && (
+                        <div className="mt-3 pl-7">
+                          <label className="text-xs font-medium text-stone-600 mb-1.5 block flex items-center gap-1.5">
+                            <Phone className="w-3.5 h-3.5 text-stone-400" />
+                            Mobile number
+                          </label>
+                          <input
+                            type="tel"
+                            value={staff.mobile}
+                            onChange={(e) => updateStaff(staff.id, { mobile: e.target.value })}
+                            placeholder="(555) 123-4567"
+                            className="w-full text-sm border border-stone-200 rounded-lg px-3.5 py-2.5 outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition placeholder:text-stone-300"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
@@ -248,7 +269,7 @@ export function Step6Team() {
                   className="w-4 h-4 rounded accent-[#10B981] mt-0.5"
                 />
                 <span className="text-xs text-stone-500">
-                  I confirm that staff members have consented to receive SMS alerts at this number.
+                  I confirm that selected staff members have consented to receive SMS alerts at their listed mobile numbers.
                   <span className="text-rose-500 font-medium"> Required to continue.</span>
                 </span>
               </label>
