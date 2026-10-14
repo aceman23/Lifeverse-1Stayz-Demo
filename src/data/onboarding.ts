@@ -77,6 +77,7 @@ export interface OnboardingState {
   escalationTopics: EscalationTopic[];
   tone: string[];
   signOff: string;
+  consentWording: string;
 
   guardrailsApprovedBy: string | null;
   guardrailsApprovedAt: string | null;
@@ -272,6 +273,7 @@ export function createInitialState(): OnboardingState {
     })),
     tone: ['Warm'],
     signOff: 'The team at Grace Community Church',
+    consentWording: CONSENT_WORDING,
     guardrailsApprovedBy: null,
     guardrailsApprovedAt: null,
     firstMessageStatus: 'draft',

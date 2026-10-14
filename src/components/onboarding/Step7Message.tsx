@@ -94,14 +94,20 @@ export function Step7Message() {
     });
   }
 
+  function updateConsentWording(value: string) {
+    const churchName = state.church.name || 'Grace Community Church';
+    update({ consentWording: value.replaceAll(churchName, '{church_name}') });
+  }
+
   function copyConsent() {
-    const text = CONSENT_WORDING.replace(/\{church_name\}/g, state.church.name || 'Grace Community Church');
-    navigator.clipboard?.writeText(text);
+    navigator.clipboard?.writeText(consentText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const consentText = CONSENT_WORDING.replace(/\{church_name\}/g, state.church.name || 'Grace Community Church');
+  const churchName = state.church.name || 'Grace Community Church';
+  const consentTemplate = state.consentWording || CONSENT_WORDING;
+  const consentText = consentTemplate.replace(/\{church_name\}/g, churchName);
   const status = state.firstMessageStatus;
 
   return (
@@ -231,9 +237,16 @@ export function Step7Message() {
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
-        <div className="bg-stone-50/50 rounded-xl p-4">
-          <p className="text-xs text-stone-500 leading-relaxed">{consentText}</p>
-        </div>
+        <textarea
+          value={consentText}
+          onChange={(e) => updateConsentWording(e.target.value)}
+          rows={4}
+          aria-label="Connection Card Consent Wording"
+          className="w-full bg-stone-50/50 rounded-xl p-4 text-xs text-stone-600 leading-relaxed border border-transparent outline-none resize-none focus:bg-white focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition"
+        />
+        <p className="text-[11px] text-stone-400 mt-2">
+          The church name comes from your earlier church information and updates automatically if you change it.
+        </p>
       </div>
 
       {/* Approval */}
