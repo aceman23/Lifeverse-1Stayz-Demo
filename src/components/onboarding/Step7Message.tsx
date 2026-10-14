@@ -115,7 +115,7 @@ export function Step7Message() {
 
       {/* Template picker */}
       <div className="bg-white rounded-2xl border border-[#ECECE8] p-6">
-        <h3 className="text-sm font-semibold text-stone-800 mb-4">Choose a template</h3>
+        <h3 className="text-sm font-semibold text-stone-800 mb-4">Choose tone</h3>
         <div className="space-y-2.5">
           {state.templates.map((t) => {
             const selected = state.selectedTemplate === t.id;
