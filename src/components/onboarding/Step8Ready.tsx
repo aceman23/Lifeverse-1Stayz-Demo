@@ -159,12 +159,12 @@ export function Step8Ready() {
           <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-4">
             <Eye className="w-5 h-5 text-amber-600" />
           </div>
-          <h3 className="text-sm font-semibold text-stone-900 mb-1">Start in Shadow Mode</h3>
+          <h3 className="text-sm font-semibold text-stone-900 mb-1">Start in Approval Mode</h3>
           <p className="text-xs text-stone-400 leading-relaxed mb-4">
             1Stayz writes every message but holds it for your approval before sending. Review at your own pace.
           </p>
           <span className="inline-flex items-center gap-1 text-xs font-medium text-[#10B981] group-hover:gap-2 transition-all">
-            Start in shadow
+            Start in Approval Mode
             <ArrowRight className="w-3.5 h-3.5" />
           </span>
         </button>
