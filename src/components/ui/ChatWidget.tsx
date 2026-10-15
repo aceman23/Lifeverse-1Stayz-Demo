@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, MessageCircle, ChevronRight } from 'lucide-react';
+import { Bot, X, Send, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
 
 interface ChatMessage {
@@ -243,17 +243,22 @@ export function ChatWidget({ context = 'auth' }: ChatWidgetProps) {
 
       <button
         onClick={() => setOpen((p) => !p)}
-        className={`w-13 h-13 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 ${
+        aria-label={open ? 'Close Ask 1Stayz' : 'Open Ask 1Stayz'}
+        className={`rounded-full shadow-lg flex items-center justify-center gap-2 transition-all duration-200 ${
           open
             ? 'bg-stone-800 hover:bg-stone-700 w-11 h-11'
-            : 'bg-amber-500 hover:bg-amber-600 w-14 h-14 hover:scale-105'
+            : 'bg-[#008f83] hover:bg-[#00796f] px-4 h-14 hover:scale-[1.02]'
         }`}
-        style={{ width: open ? 44 : 56, height: open ? 44 : 56 }}
       >
         {open ? (
           <X className="w-5 h-5 text-white" />
         ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
+          <>
+            <div className="w-9 h-9 rounded-full border-2 border-white/80 bg-white/15 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-sm font-semibold text-white whitespace-nowrap">Ask 1Stayz</span>
+          </>
         )}
         {!open && unread && (
           <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white" />

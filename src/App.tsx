@@ -22,6 +22,7 @@ import { VisitorProfilePage } from './pages/VisitorProfilePage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { TodayPage } from './pages/TodayPage';
 import { SpecModeToggle, SpecPanel } from './components/ui/SpecMarker';
+import { ChatWidget } from './components/ui/ChatWidget';
 
 function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,6 +48,7 @@ function AppShell() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        <ChatWidget context="dashboard" />
       </div>
     </div>
   );
