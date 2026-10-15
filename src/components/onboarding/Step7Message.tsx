@@ -96,7 +96,7 @@ export function Step7Message() {
 
   function updateConsentWording(value: string) {
     const churchName = state.church.name || 'Grace Community Church';
-    update({ consentWording: value.replaceAll(churchName, '{church_name}') });
+    update({ consentWording: value.split(churchName).join('{church_name}') });
   }
 
   function copyConsent() {

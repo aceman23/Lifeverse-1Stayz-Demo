@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, MessageCircle, ChevronRight } from 'lucide-react';
+import { useAuth } from '../../lib/auth';
 
 interface ChatMessage {
   id: string;
@@ -58,6 +59,7 @@ const GRACE_GREETING_AUTH = "Hi! I'm Grace, your Agentic AI digital assistants a
 const GRACE_GREETING_DASHBOARD = "Hi! I'm Grace. Need help navigating the platform or understanding a feature?";
 
 const FALLBACK_RESPONSE = "That's a great question. For anything not covered here, please reach out to your church administrator or contact our support team. I'm here to help with platform navigation and general questions.";
+const AI_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`; 
 
 function pickResponse(input: string, context: 'auth' | 'dashboard'): string {
   const lower = input.toLowerCase();
@@ -77,6 +79,7 @@ function pickResponse(input: string, context: 'auth' | 'dashboard'): string {
 }
 
 export function ChatWidget({ context = 'auth' }: ChatWidgetProps) {
+  const { session, demoMode } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -116,10 +119,34 @@ export function ChatWidget({ context = 'auth' }: ChatWidgetProps) {
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: msg };
     setMessages((p) => [...p, userMsg]);
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900 + Math.random() * 500));
-    const reply = pickResponse(msg, context);
-    setMessages((p) => [...p, { id: (Date.now() + 1).toString(), role: 'grace', text: reply }]);
-    setLoading(false);
+
+    try {
+      let reply = pickResponse(msg, context);
+      if (session && !demoMode) {
+        const response = await fetch(AI_CHAT_URL, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [...messages, userMsg].map((message) => ({
+              role: message.role === 'grace' ? 'assistant' : 'user',
+              content: message.text,
+            })),
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok || typeof data.text !== 'string') {
+          throw new Error(typeof data.error === 'string' ? data.error : 'The AI assistant is unavailable.');
+        }
+        reply = data.text;
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 900 + Math.random() * 500));
+      }
+      setMessages((p) => [...p, { id: (Date.now() + 1).toString(), role: 'grace', text: reply }]);
+    } catch (cause) {
+      setMessages((p) => [...p, { id: (Date.now() + 1).toString(), role: 'grace', text: cause instanceof Error ? cause.message : 'The AI assistant is temporarily unavailable.' }]);
+    } finally {
+      setLoading(false);
+    }
     if (!open) setUnread(true);
   }
 

@@ -13,7 +13,6 @@ import { Step6Team } from '../components/onboarding/Step6Team';
 import { Step7Message } from '../components/onboarding/Step7Message';
 import { Step8Ready } from '../components/onboarding/Step8Ready';
 import { SpecMarker } from '../components/ui/SpecMarker';
-import type { OnboardingState } from '../data/onboarding';
 
 export function OnboardingPage() {
   const navigate = useNavigate();
@@ -22,7 +21,6 @@ export function OnboardingPage() {
   const [coachOpen, setCoachOpen] = useState(true);
 
   const step = state.currentStep;
-  const canContinue = checkCanContinue(step, state);
   const isSignedIn = !!(session || demoMode);
 
   function handleSaveExit() {
@@ -155,26 +153,3 @@ export function OnboardingPage() {
   );
 }
 
-function checkCanContinue(step: number, state: OnboardingState): boolean {
-  switch (step) {
-    case 0:
-      return state.church.name.trim() !== '' && state.church.yourName.trim() !== '' && state.church.yourRole !== '';
-    case 1:
-      return state.serviceSchedule.length > 0 && state.serviceSchedule.every(
-        (s) => s.name.trim() !== '' && s.day !== '' && s.startTime !== '' && s.endTime !== '' && s.startTime < s.endTime
-      );
-    case 2:
-      return state.needs.length > 0 || state.otherNeed.trim() !== '';
-    case 3:
-      return true;
-    case 4:
-      return !!state.guardrailsApprovedBy;
-    case 5:
-      return state.staff.length > 0 && state.staff.some((s) => s.receivesEscalations) &&
-        (!state.staffAlertsEnabled || state.staffAlertsConsent);
-    case 6:
-      return state.firstMessageStatus === 'approved';
-    default:
-      return true;
-  }
-}

@@ -11,6 +11,7 @@ import { Step7Message } from '../components/onboarding/Step7Message';
 import { Step4Systems } from '../components/onboarding/Step4Systems';
 import { useOnboarding } from '../lib/onboarding-context';
 import { SpecMarker } from '../components/ui/SpecMarker';
+import { AIProviderSettings } from '../components/settings/AIProviderSettings';
 
 const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-beta-signups`;
 
@@ -21,6 +22,7 @@ const TABS = [
   { key: 'team', label: 'Team & Escalations', icon: Users },
   { key: 'message', label: 'First Message', icon: MessageSquare },
   { key: 'integrations', label: 'Integrations', icon: Plug },
+  { key: 'ai', label: 'AI assistant', icon: MessageSquare },
   { key: 'mode', label: 'Mode', icon: ToggleRight },
 ] as const;
 
@@ -113,6 +115,7 @@ export function SettingsPage() {
         {activeTab === 'team' && <Step6Team />}
         {activeTab === 'message' && <Step7Message />}
         {activeTab === 'integrations' && <Step4Systems />}
+        {activeTab === 'ai' && <AIProviderSettings />}
         {activeTab === 'mode' && (
           <ModeTab state={state} update={update} />
         )}

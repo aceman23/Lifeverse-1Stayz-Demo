@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useOnboarding } from '../../lib/onboarding-context';
-import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, Sliders, Check, Lock, CheckCircle2, Sparkles, Send } from 'lucide-react';
+import { Upload, FileText, Trash2, ArrowRight, Shield, AlertTriangle, Sliders, Check, CheckCircle2, Sparkles, Send } from 'lucide-react';
 import type { DoctrinalPosition } from '../../data/onboarding';
 
 export function Step5Guardrails() {
