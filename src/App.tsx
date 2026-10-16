@@ -23,6 +23,10 @@ import { OnboardingPage } from './pages/OnboardingPage';
 import { TodayPage } from './pages/TodayPage';
 import { SpecModeToggle, SpecPanel } from './components/ui/SpecMarker';
 import { ChatWidget } from './components/ui/ChatWidget';
+import { PublicHomePage } from './pages/PublicHomePage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { TermsPage } from './pages/TermsPage';
+import { GuestConnectionPage } from './pages/GuestConnectionPage';
 
 function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,6 +65,10 @@ export default function App() {
         <SpecModeProvider>
           <BrowserRouter>
             <Routes>
+              <Route path="/" element={<PublicHomePage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/connect/:churchSlug" element={<GuestConnectionPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/sign-up" element={<SignUpPage />} />
               <Route path="/beta" element={<BetaSignupPage />} />

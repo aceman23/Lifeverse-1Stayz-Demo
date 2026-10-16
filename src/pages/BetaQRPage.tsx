@@ -2,7 +2,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const BETA_URL = 'https://lifeverse-1stayz-demo1.bolt.host/beta';
+const BETA_URL = 'https://lifeverse-1stayz-demo1.bolt.host/connect/grace-community-church';
 
 export function BetaQRPage() {
   return (
@@ -25,9 +25,9 @@ export function BetaQRPage() {
         />
       </div>
 
-      <h1 className="text-2xl font-bold text-stone-900 mt-8 text-center tracking-tight relative z-10">Scan to Join the Beta</h1>
+      <h1 className="text-2xl font-bold text-stone-900 mt-8 text-center tracking-tight relative z-10">Scan to connect with Grace Community Church</h1>
       <p className="text-sm text-stone-500 mt-2 text-center max-w-xs leading-relaxed relative z-10">
-        Point your phone camera here to sign up for early access to 1Stayz in under 30 seconds.
+        Share your details with the church and choose whether you would like text follow-up from 1Stayz.
       </p>
 
       <p className="text-xs text-stone-300 mt-8 relative z-10">{BETA_URL}</p>
